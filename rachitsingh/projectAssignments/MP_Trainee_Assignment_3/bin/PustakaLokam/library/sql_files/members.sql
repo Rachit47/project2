@@ -1,0 +1,8 @@
+CREATE TABLE members (
+    MemberId INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(255) NOT NULL,
+    Email VARCHAR(255) NOT NULL UNIQUE,
+    Mobile BIGINT NOT NULL UNIQUE,
+    Gender CHAR(1) NOT NULL CHECK (Gender IN ('M', 'F')),
+    Address VARCHAR(255) NOT NULL
+);

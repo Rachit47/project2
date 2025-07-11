@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="editForm">
+<body>
+	<h2>Edit Book Details</h2>
+	<div th:if="${selectedBook != null}">
+		<form method="post" th:action="@{/books/update}">
+			<input type="hidden" name="bookID" th:value="${selectedBook.bookID}"
+				readonly /> <label>Title:</label><br /> <input type="text"
+				name="title" th:value="${selectedBook.title}" required /><br />
+			<br /> <label>Author:</label><br /> <input type="text"
+				name="author" th:value="${selectedBook.author}" required /><br />
+			<br /> <label>Category:</label><br /> <input type="text"
+				name="category" th:value="${selectedBook.category}" required /><br />
+			<br /> <label>Condition:</label><br /> <select name="condition">
+				<option value="A"
+					th:selected="${selectedBook.condition.name() == 'ACTIVE'}">Active</option>
+				<option value="I"
+					th:selected="${selectedBook.condition.name() == 'INACTIVE'}">Inactive</option>
+			</select><br />
+			<br /> <label>Status:</label><br /> <select name="status">
+				<option value="A"
+					th:selected="${selectedBook.availability.name() == 'AVAILABLE'}">Available</option>
+				<option value="I"
+					th:selected="${selectedBook.availability.name() == 'ISSUED'}">Issued</option>
+			</select><br />
+			<br />
+
+			<button type="submit">Update Book</button>
+		</form>
+	</div>
+	<div th:if="${selectedBook == null}">
+		<p style="color: red">⚠️ No book selected for editing.</p>
+	</div>
+	<hr />
+</body>
+</html>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="PustakaLokam.library.controller.member.MemberController"
+      spacing="15" alignment="TOP_CENTER">
+    <padding>
+        <Insets top="20" right="30" bottom="20" left="30"/>
+    </padding>
+
+    <GridPane hgap="10" vgap="10">
+        <Label text="Name:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="nameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Email:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="emailField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Mobile:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="mobileField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Gender:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <ChoiceBox fx:id="genderBox" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Address:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <TextArea fx:id="addressField" prefRowCount="3"
+                  GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <Button text="Add Member" onAction="#handleAddMember"/>
+
+    <HBox spacing="5">
+        <TextField fx:id="searchBar" promptText="Search…" />
+        <Button text="Search" onAction="#handleSearchBar"/>
+        <Button text="Clear" onAction="#handleClear"/>
+    </HBox>
+
+    <TableView fx:id="memberTable">
+        <columns>
+            <TableColumn fx:id="nameCol" text="Name"/>
+            <TableColumn fx:id="emailCol" text="Email"/>
+            <TableColumn fx:id="mobileCol" text="Mobile"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="15">
+        <Button text="Delete Member" onAction="#handleDeleteMember"/>
+        <Button text="Update Member" onAction="#handleUpdateMember"/>
+    </HBox>
+</VBox>

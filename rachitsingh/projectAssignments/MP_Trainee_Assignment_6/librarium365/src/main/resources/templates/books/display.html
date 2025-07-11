@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="bookList">
+<body>
+<h2>All Registered Books</h2>
+
+<table border="1" cellpadding="10">
+    <thead>
+    <tr>
+        <th>Book ID</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Condition</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${books}">
+        <td th:text="${book.bookID}">1</td>
+        <td th:text="${book.title}">Title</td>
+        <td th:text="${book.author}">Author</td>
+        <td th:text="${book.category}">Category</td>
+        <td th:text="${book.availability}">AVAILABLE</td>
+        <td th:text="${book.condition}">ACTIVE</td>
+        <td>
+            <a th:href="@{'/books/edit/' + ${book.bookID}}">Edit</a> |
+            <a th:href="@{'/books/delete/' + ${book.bookID}}" 
+               onclick="return confirm('Are you sure?')">Delete</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Librarium365 - Control Room</title>
+<link rel="stylesheet" th:href="@{/style.css}" />
+</head>
+<body>
+	<h1>📚Welcome to the Librarium365</h1>
+	<h2>Please login</h2>
+	<form th:action="@{/login}" method="post">
+		<div>
+			<label>Username:</label> <input type="text" name="username" />
+		</div>
+		<div>
+			<label>Password:</label> <input type="password" name="password" />
+		</div>
+		<div>
+			<button type="submit">Login</button>
+		</div>
+		<div th:if="${param.error}" style="color: red;">Invalid username
+			or password.</div>
+		<div th:if="${param.logout}" style="color: green;">You have been
+			logged out.</div>
+	</form>
+</body>
+</html>

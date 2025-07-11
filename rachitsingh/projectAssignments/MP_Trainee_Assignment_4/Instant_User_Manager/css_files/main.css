@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&family=Orbitron:wght@400..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+body {
+  margin: 10px;
+  padding: 10px;
+  font-family: 'Ubuntu', sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+h1, h2, h3 {
+  font-family: 'Orbitron', 'Archivo', sans-serif;
+  color: #00ffd9;
+  margin-bottom: 10px;
+}
+
+.container {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #1e1e1e;
+  border-radius: 6px;
+}
+
+button,
+input[type="submit"] {
+  background-color: #38e6cc;
+  color: #3f3b3b;
+  border: none;
+  display: flex;
+  align-items: center;
+  padding: 20px 20px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 800;
+  border-radius: 5px;
+  margin: 10px;
+  cursor: pointer;
+}
+
+button:hover,
+input[type="submit"]:hover {
+  background-color: #79f149;
+}
+
+#branchContainer {
+  border: 2px solid #444;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  background-color: #2a2a2a;
+  padding-right: 10px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="phone"],
+select,
+textarea {
+  width: 100%;
+  padding: 10px;
+  background-color: #2a2a2a;
+  border: 3px solid #444;
+  color: #fff;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #00ffd9;
+}
+
+.text-center {
+  text-align: center;
+}
+
+
+.form-group,
+fieldset.form-group,
+.search-box {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #1f1f1f;
+  border: 2px solid #444;
+  margin-bottom: 15px;
+}
+
+.search-box input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  background-color: #2a2a2a;
+  border: 3px solid #444;
+  color: #fff;
+  border-radius: 5px;
+}

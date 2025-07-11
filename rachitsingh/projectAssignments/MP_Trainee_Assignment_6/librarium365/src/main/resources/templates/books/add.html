@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="addForm">
+<head>
+<meta charset="UTF-8">
+<title>Add New Book</title>
+</head>
+<body>
+
+	<h2>Add a New Book</h2>
+
+	<form method="post" th:action="@{/books/add}">
+		<fieldset>
+			<legend>Book Details</legend>
+
+			<label for="title">Title:</label><br /> <input type="text"
+				id="title" name="title" required /><br />
+			<br /> <label for="author">Author:</label><br /> <input type="text"
+				id="author" name="author" required /><br />
+			<br /> <label for="category">Category:</label><br /> <input
+				type="text" id="category" name="category" required /><br />
+			<br /> <label for="condition">Condition:</label><br /> <select
+				id="condition" name="condition">
+				<option value="A">Active</option>
+				<option value="I">Inactive</option>
+			</select><br />
+			<br /> <label for="status">Availability:</label><br /> <select
+				id="status" name="status">
+				<option value="A">Available</option>
+				<option value="I">Issued</option>
+			</select><br />
+			<br />
+
+			<button type="submit">Add Book to Batch</button>
+		</fieldset>
+	</form>
+
+	<form method="post" th:action="@{/books/submit}"
+		style="margin-top: 1em;">
+		<button type="submit">Submit All Books</button>
+	</form>
+	<p th:if="${formError}" th:text="${formError}" style="color: red;"></p>
+
+	<hr />
+
+	<h3>Batch of Books to be Added:</h3>
+	<ul th:if="${batchedBooks != null and !batchedBooks.isEmpty()}">
+		<li th:each="book : ${batchedBooks}"><strong
+			th:text="${book.title}">Title</strong> by <span
+			th:text="${book.author}">Author</span> (Category: <span
+			th:text="${book.category}">Category</span>, Condition: <span
+			th:text="${book.condition}">Condition</span>, Status: <span
+			th:text="${book.availability}">Availability</span>)</li>
+	</ul>
+
+	<p th:if="${batchedBooks == null or batchedBooks.isEmpty()}">No
+		books added yet.</p>
+
+</body>
+</html>

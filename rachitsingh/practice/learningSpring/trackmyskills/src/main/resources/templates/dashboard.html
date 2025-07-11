@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Skill Tracker Dashboard</title>
+<link rel="stylesheet" href="/css/dashboard.css" />
+</head>
+<body>
+	<div class="container">
+
+		<!-- Header -->
+		<header class="section">
+			<h1>
+				Hello <span th:text="${userName}">User</span>!
+			</h1>
+			<p>Welcome to your personalized skill learning dashboard.</p>
+		</header>
+
+		<!-- Skill Tree Visualization -->
+		<section class="section">
+			<h2>📚 Skill Learning Path</h2>
+			<p>Explore the skills and track your progress:</p>
+			<ul class="tree">
+				<li th:each="skill : ${rootSkills}"><span
+					th:text="${skill.skillName}"
+					th:classappend="${completedSkillIds.contains(skill.id)} ? ' completed' : ' locked'">
+				</span>
+					<ul
+						th:insert="~{::renderChildren(${skill.id}, ${childrenMap}, ${completedSkillIds})}"></ul>
+				</li>
+			</ul>
+		</section>
+
+		<!-- Recursive Child Skills Fragment -->
+		<th:block
+			th:fragment="renderChildren(parentId, childrenMap, completedSkillIds)">
+			<ul th:if="${childrenMap.containsKey(parentId)}">
+				<li th:each="child : ${childrenMap[parentId]}"><span
+					th:text="${child.skillName}"
+					th:classappend="${completedSkillIds.contains(child.id)} ? ' completed' : ' locked'">
+				</span>
+					<ul
+						th:insert="~{::renderChildren(${child.id}, ${childrenMap}, ${completedSkillIds})}"></ul>
+				</li>
+			</ul>
+		</th:block>
+
+		<!-- Completed Skills Section -->
+		<section class="section">
+			<h2>✅ Skills You've Completed</h2>
+			<ul>
+				<li th:each="skillId : ${completedSkillIds}"><span
+					th:text="${skillIdToNameMap[skillId]}">Skill Name</span></li>
+			</ul>
+		</section>
+
+		<!-- Recommendations Section -->
+		<section class="section">
+			<h2>🔍 Recommended Skills</h2>
+			<p>Based on your progress, here are suggested next steps:</p>
+			<ul>
+				<li th:each="skill : ${recommendations}"><span
+					th:text="${skill.skillName}">Skill</span> (Difficulty: <span
+					th:text="${skill.difficulty}">Medium</span>)
+					<form th:action="@{/dashboard/completeSkill}" method="post"
+						style="display: inline;">
+						<input type="hidden" name="userId" th:value="${userId}" /> <input
+							type="hidden" name="skillId" th:value="${skill.id}" />
+						<button type="submit">Mark Completed</button>
+					</form></li>
+			</ul>
+		</section>
+
+		<!-- Most Learned Skills -->
+		<section class="section">
+			<h2>🏆 Most Learned Skills</h2>
+			<ul>
+				<li th:each="entry : ${topSkills}"><span
+					th:text="${entry.key.skillName}">Skill</span> - <span
+					th:text="${entry.value}">0</span> completions</li>
+			</ul>
+		</section>
+
+		<!-- All Available Skills -->
+		<section class="section">
+			<h2>📦 All Available Skills</h2>
+			<ul>
+				<li th:each="skill : ${skills}"><span
+					th:text="${skill.skillName}">Skill</span></li>
+			</ul>
+		</section>
+
+	</div>
+</body>
+</html>

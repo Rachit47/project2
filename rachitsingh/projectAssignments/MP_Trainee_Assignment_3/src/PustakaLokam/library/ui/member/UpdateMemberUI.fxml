@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="PustakaLokam.library.controller.member.UpdateMemberController"
+      spacing="20" alignment="TOP_CENTER">
+
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
+
+    <Label text="Update Member" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+    <GridPane hgap="12" vgap="12">
+        <Label text="Name:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="nameField" promptText="Enter name" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Email:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="emailField" promptText="Enter email" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Mobile:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="mobileField" promptText="Enter mobile" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Gender:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <ChoiceBox fx:id="genderBox" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Address:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <TextArea fx:id="addressField" promptText="Enter address" prefRowCount="3" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <Button text="Save Changes" onAction="#handleSave" minWidth="150"/>
+</VBox>

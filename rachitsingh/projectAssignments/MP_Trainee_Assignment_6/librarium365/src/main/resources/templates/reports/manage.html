@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Librarium365 - Reports Dashboard</title>
+<style>
+table {
+	border-collapse: collapse;
+	width: 100%;
+	margin-top: 1em;
+}
+
+th, td {
+	border: 1px solid #ccc;
+	padding: 8px;
+}
+
+th {
+	background-color: #f5f5f5;
+}
+</style>
+</head>
+<body>
+
+	<h1>📊 Librarium365 - Reports Dashboard</h1>
+	<div
+		style="background: #f0f8ff; padding: 12px 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); display: flex; align-items: center; justify-content: space-between; max-width: 400px; margin: 20px auto; font-family: 'Segoe UI', sans-serif;">
+
+		<span style="font-size: 1.1em; color: #333;"> 👋 Welcome, <strong
+			th:text="${#authentication.name}" style="color: #0077cc;">Admin</strong>
+		</span>
+
+		<!-- Logout Button -->
+		<form th:action="@{/logout}" method="post" style="margin-left: 10px;">
+			<input type="hidden" th:name="${_csrf.parameterName}"
+				th:value="${_csrf.token}" />
+			<button type="submit"
+				style="background-color: #0077cc; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-size: 0.95em; cursor: pointer; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); transition: all 0.3s ease;">
+				🔓 Logout</button>
+		</form>
+	</div>
+
+	<hr />
+
+	<section>
+		<h2>📕 Overdue Books</h2>
+		<table>
+			<thead>
+				<tr>
+					<th>Issue ID</th>
+					<th>Book ID</th>
+					<th>Member ID</th>
+					<th>Issue Date</th>
+					<th>Status</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="issue : ${overdueBooks}">
+					<td th:text="${issue.issueID}">1</td>
+					<td th:text="${issue.bookID}">101</td>
+					<td th:text="${issue.memberID}">501</td>
+					<td th:text="${issue.issueDate}">2024-05-01</td>
+					<td th:text="${issue.status}">ISSUED</td>
+				</tr>
+				<tr th:if="${#lists.isEmpty(overdueBooks)}">
+					<td colspan="5" style="text-align: center">✅ No overdue books
+						found.</td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+
+	<section>
+		<h2>📚 Book Count by Category</h2>
+		<table>
+			<thead>
+				<tr>
+					<th>Category</th>
+					<th>Book Count</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="entry : ${categoryCounts}">
+					<td th:text="${entry.key}">Science</td>
+					<td th:text="${entry.value}">10</td>
+				</tr>
+				<tr th:if="${#lists.isEmpty(categoryCounts)}">
+					<td colspan="2" style="text-align: center">No data available.</td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+
+	<section>
+		<h2>🧑‍💼 Members with Active Issues</h2>
+		<table>
+			<thead>
+				<tr>
+					<th>Member ID</th>
+					<th>Name</th>
+					<th>Email</th>
+					<th>Mobile</th>
+					<th>Gender</th>
+					<th>Address</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="member : ${activeIssueMembers}">
+					<td th:text="${member.memberId}">501</td>
+					<td th:text="${member.name}">Master Oogway</td>
+					<td th:text="${member.email}">oogway@example.com</td>
+					<td th:text="${member.mobile}">9876543210</td>
+					<td th:text="${member.gender}">M</td>
+					<td th:text="${member.address}">123 Main St</td>
+				</tr>
+				<tr th:if="${#lists.isEmpty(activeIssueMembers)}">
+					<td colspan="6" style="text-align: center">No members with active issues.</td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+
+</body>
+</html>

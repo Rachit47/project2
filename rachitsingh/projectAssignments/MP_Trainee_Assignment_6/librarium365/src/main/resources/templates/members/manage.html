@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Librarium365 - Member Dashboard</title>
+<script>
+        function validateMemberForm(formId) {
+            const form = document.getElementById(formId);
+            const name = form.querySelector('[name="name"]').value.trim();
+            const email = form.querySelector('[name="email"]').value.trim();
+            const mobile = form.querySelector('[name="mobile"]').value.trim();
+            const gender = form.querySelector('[name="gender"]').value;
+            const address = form.querySelector('[name="address"]').value.trim();
+
+            if (!name || !email || !mobile || !gender || !address) {
+                alert("⚠️ Please fill in all fields before submitting.");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+<body>
+
+	<h1>👤 Librarium365 - Member Management Dashboard</h1>
+	<div
+		style="background: #f0f8ff; padding: 12px 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); display: flex; align-items: center; justify-content: space-between; max-width: 400px; margin: 20px auto; font-family: 'Segoe UI', sans-serif;">
+
+		<span style="font-size: 1.1em; color: #333;"> 👋 Welcome, <strong
+			th:text="${#authentication.name}" style="color: #0077cc;">Admin</strong>
+		</span>
+
+		<!-- Logout Button -->
+		<form th:action="@{/logout}" method="post" style="margin-left: 10px;">
+			<input type="hidden" th:name="${_csrf.parameterName}"
+				th:value="${_csrf.token}" />
+			<button type="submit"
+				style="background-color: #0077cc; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-size: 0.95em; cursor: pointer; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); transition: all 0.3s ease;">
+				🔓 Logout</button>
+		</form>
+	</div>
+
+	<hr />
+
+	<div>
+		<h2>Add New Member</h2>
+		<form method="post" th:action="@{/members/add}" id="addForm"
+			onsubmit="return validateMemberForm('addForm')">
+			<label>Name:</label><br /> <input type="text" name="name" /><br />
+			<br /> <label>Email:</label><br /> <input type="email" name="email" /><br />
+			<br /> <label>Mobile:</label><br /> <input type="number"
+				name="mobile" /><br /> <br /> <label>Gender:</label><br /> <select
+				name="gender">
+				<option value="">--Select--</option>
+				<option value="M">Male</option>
+				<option value="F">Female</option>
+				<option value="O">Other</option>
+			</select><br /> <br /> <label>Address:</label><br />
+			<textarea name="address" rows="3" cols="40"></textarea>
+			<br /> <br />
+
+			<button type="submit">Add Member</button>
+		</form>
+	</div>
+
+	<hr />
+
+	<div>
+		<h2>All Members</h2>
+		<table border="1" cellpadding="10">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Name</th>
+					<th>Email</th>
+					<th>Mobile</th>
+					<th>Gender</th>
+					<th>Address</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="member : ${members}">
+					<td th:text="${member.memberId}">1</td>
+					<td th:text="${member.name}">Name</td>
+					<td th:text="${member.email}">email@example.com</td>
+					<td th:text="${member.mobile}">1234567890</td>
+					<td th:text="${member.gender}">M</td>
+					<td th:text="${member.address}">Address</td>
+					<td><a th:href="@{'/members/edit/' + ${member.memberId}}">Edit</a>
+						|
+						<form th:action="@{/members/delete}" method="post"
+							style="display: inline;">
+							<input type="hidden" name="memberId"
+								th:value="${member.memberId}" />
+							<button type="submit"
+								onclick="return confirm('Are you sure to delete this member?')">Delete</button>
+						</form></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<hr />
+
+	<div th:if="${selectedMember != null}">
+		<h2>Edit Member</h2>
+		<form method="post" th:action="@{/members/update}" id="updateForm"
+			onsubmit="return validateMemberForm('updateForm')">
+			<input type="hidden" name="memberId"
+				th:value="${selectedMember.memberId}" /> <label>Name:</label><br />
+			<input type="text" name="name" th:value="${selectedMember.name}" /><br />
+			<br /> <label>Email:</label><br /> <input type="email" name="email"
+				th:value="${selectedMember.email}" /><br /> <br /> <label>Mobile:</label><br />
+			<input type="number" name="mobile"
+				th:value="${selectedMember.mobile}" /><br /> <br /> <label>Gender:</label><br />
+			<select name="gender">
+				<option value="">--Select--</option>
+				<option value="M" th:selected="${selectedMember.gender == 'M'}">Male</option>
+				<option value="F" th:selected="${selectedMember.gender == 'F'}">Female</option>
+				<option value="O" th:selected="${selectedMember.gender == 'O'}">Other</option>
+			</select><br /> <br /> <label>Address:</label><br />
+			<textarea name="address" rows="3" cols="40"
+				th:text="${selectedMember.address}"></textarea>
+			<br /> <br />
+
+			<button type="submit">Update Member</button>
+		</form>
+	</div>
+
+</body>
+</html>

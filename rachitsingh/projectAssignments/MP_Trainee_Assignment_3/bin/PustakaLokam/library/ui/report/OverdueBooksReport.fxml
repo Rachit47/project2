@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="PustakaLokam.library.controller.report.OverdueBooksReportController"
+            prefWidth="600" prefHeight="400">
+    <children>
+        <Label text="Overdue Books Report" layoutX="200" layoutY="10" style="-fx-font-size: 18px;"/>
+        <TableView fx:id="overdueBooksTable" layoutX="20" layoutY="50" prefWidth="560" prefHeight="330">
+            <columns>
+                <TableColumn fx:id="issueIdColumn" text="Issue ID" prefWidth="75"/>
+                <TableColumn fx:id="bookIdColumn" text="Book ID" prefWidth="75"/>
+                <TableColumn fx:id="memberIdColumn" text="Member ID" prefWidth="100"/>
+                <TableColumn fx:id="issueDateColumn" text="Issue Date" prefWidth="120"/>
+            </columns>
+        </TableView>
+    </children>
+</AnchorPane>

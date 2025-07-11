@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Confirm Delete</title>
+</head>
+<body>
+	<h2>Confirm Deletion</h2>
+
+	<p>Are you sure you want to delete the book:</p>
+	<ul>
+		<li><strong>Title:</strong> <span th:text="${book.title}"></span></li>
+		<li><strong>Author:</strong> <span th:text="${book.author}"></span></li>
+		<li><strong>Category:</strong> <span th:text="${book.category}"></span></li>
+	</ul>
+
+	<form th:action="@{/books/delete}" method="post">
+		<input type="hidden" name="bookID" th:value="${book.bookID}" />
+		<button type="submit">Yes, Delete</button>
+		<a th:href="@{/books}">
+			<button type="button">Cancel</button>
+		</a>
+	</form>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Instant User Manager</title>
+
+    <link rel="stylesheet" href="css_files/main.css" />
+    <link rel="stylesheet" href="css_files/form.css" />
+    <link rel="stylesheet" href="css_files/table.css" />
+    <link rel="stylesheet" href="css_files/errors.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Add User Data</h1>
+
+      <form id="dataForm" autocomplete="off">
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" />
+          <span class="error" id="inputNameError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="age">Age:</label>
+          <input type="number" id="age" name="age" min="1" />
+          <span class="error" id="inputAgeError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" />
+          <span class="error" id="inputEmailError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone Number:</label>
+          <input type="phone" id="phone" name="phone" maxlength="10" />
+          <span class="error" id="inputPhoneError"></span>
+        </div>
+
+        <fieldset class="form-group" id = "branchContainer">
+          <legend>Branch:</legend>
+          <label><input type="radio" name="branch" value="CSE" /> CSE</label>
+          <label><input type="radio" name="branch" value="ECE" /> ECE</label>
+          <label><input type="radio" name="branch" value="EEE" /> EEE</label>
+          <span class="error" id="inputBranchError"></span>
+        </fieldset>
+
+        <fieldset class="languagesContainer">
+          <legend>Languages Known:</legend>
+          <label
+            ><input type="checkbox" name="languages" value="English" />
+            English</label
+          >
+          <label
+            ><input type="checkbox" name="languages" value="Hindi" />
+            Hindi</label
+          >
+          <label
+            ><input type="checkbox" name="languages" value="French" />
+            French</label
+          >
+          <span class="error" id="inputLanguagesError"></span>
+        </fieldset>
+
+        <div class="form-group">
+          <label for="state">State:</label>
+          <select id="state" name="state">
+            <option value="">-- Select State --</option>
+          </select>
+          <span class="error" id="inputStateError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="city">City:</label>
+          <select id="city" name="city">
+            <option value="">-- Select City --</option>
+          </select>
+          <span class="error" id="inputCityError"></span>
+        </div>
+
+        <button type="submit" id="addButton" disabled>Add Entry</button>
+
+      </form>
+
+      <div class="table-wrapper">
+        <table id="dataTable">
+          <thead>
+      <tr>
+        <th>
+          Name
+          <div class="search-box"><input type="text" data-column="0" placeholder="Search..." /></div>
+        </th>
+        <th>
+          Age
+          <div class="search-box"><input type="number" data-column="1" min="1" placeholder="Search..." /></div>
+        </th>
+        <th>
+          Email
+          <div class="search-box"><input type="email" data-column="2" placeholder="Search..." /></div>
+        </th>
+        <th>
+          Phone
+          <div class="search-box"><input type="tel" pattern="[6-9][0-9]{9}" placeholder="Search..." /></div>
+        </th>
+        <th>
+          Branch
+          <div class="search-box"><input type="text" data-column="4" placeholder="Search..." /></div>
+        </th>
+        <th>
+          Languages
+          <div class="search-box"><input type="text" data-column="5" placeholder="Search..." /></div>
+        </th>
+        <th>
+          State
+          <div class="search-box"><input type="text" data-column="6" placeholder="Search..." /></div>
+        </th>
+        <th>
+          City
+          <div class="search-box"><input type="text" data-column="7" placeholder="Search..." /></div>
+        </th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+          <tbody></tbody>
+        </table>
+        <p id="entryCount"></p>
+        <p id="noResults" class="hidden">No results found.</p>
+      </div>
+    </div>
+    <script src="js_files/utility.js"></script>
+    <script src="js_files/dataAPI.js"></script>
+    <script src="js_files/form.js"></script>
+    <script src="js_files/dataTable.js"></script>
+    <script src="js_files/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Pos?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="PustakaLokam.library.controller.MenuController"
+      spacing="15" alignment="CENTER" prefWidth = "400" prefHeight = "300" style="-fx-padding: 30;">
+
+    <Label text="PustakaLokam Library" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+    <Button text="Add a New Book" onAction="#onInsertBookClick" prefWidth="200"/>
+    <Button text="Update Book Details" onAction="#onUpdateBookClick" prefWidth="200"/>
+    <Button text="Delete a Book" onAction="#openDeleteBookWindow" prefWidth="200"/>
+    <Button text="View All Books" onAction="#onDisplayBooksClick" prefWidth="200"/>
+    <Button text="Member Management" onAction="#openMemberModule" minWidth="200"/>
+    <Button text="Issue Book" onAction="#openIssueModule" minWidth="200"/>
+    <Button text="Overdue Books Report" onAction="#openOverdueBooksReport"/>
+	<Button text="Books Per Category Report" onAction="#openBooksPerCategoryReport"/>
+	<Button text="Members With Active Issues Report" onAction="#openMembersWithActiveIssuesReport"/>
+    
+    <Separator/>
+
+</VBox>
+
