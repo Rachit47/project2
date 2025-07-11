@@ -104,6 +104,7 @@ public class CategoryProductMappingRequestDAOImpl implements CategoryProductMapp
 		try {
 			return namedParameterJdbcTemplate.query(sql, params, categoryProductMappingRequestRowMapper());
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new Exception("Error while fetching category product mapping requests", e);
 		}
 	}
@@ -116,7 +117,7 @@ public class CategoryProductMappingRequestDAOImpl implements CategoryProductMapp
 			req.setProductId(rs.getLong("ProductId"));
 			req.setRequestedBy(rs.getLong("RequestedBy"));
 			req.setApprovedBy(rs.getLong("ApprovedBy"));
-			req.setStatus(RequestStatus.valueOf(rs.getString("Status")));
+			req.setStatus(RequestStatus.fromCode(rs.getString("Status")));
 			req.setCreatedAtDate(rs.getTimestamp("CreatedAtDate").toLocalDateTime());
 			req.setUpdatedAtDate(
 					rs.getTimestamp("UpdatedAtDate") != null ? rs.getTimestamp("UpdatedAtDate").toLocalDateTime() : null);

@@ -30,10 +30,11 @@ public class CategoryProductMappingDAOImpl implements CategoryProductMappingDAO 
 	private static final RowMapper<Product> PRODUCT_ROW_MAPPER = (rs, rowNum) -> {
 		Product product = new Product();
 		product.setProductId(rs.getLong("ProductId"));
-		product.setProductName(rs.getString("Name"));
+		product.setProductName(rs.getString("ProductName"));
 		product.setDescription(rs.getString("Description"));
 		product.setPrice(rs.getBigDecimal("Price"));
-
+		product.setQuantity(rs.getInt("Quantity"));
+	    product.setAverageRating(rs.getBigDecimal("AverageRating"));
 		return product;
 	};
 
@@ -74,6 +75,7 @@ public class CategoryProductMappingDAOImpl implements CategoryProductMappingDAO 
 		try {
 			return namedParameterJdbcTemplate.query(fetchRecords, params, PRODUCT_ROW_MAPPER);
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new Exception("Error fetching category Products through Mapping ID", e);
 		}
 	}

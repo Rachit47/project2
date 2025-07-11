@@ -91,9 +91,9 @@ public class CategoryProductMappingRequestServiceImpl implements CategoryProduct
 
     @Override
     public List<CategoryProductMappingRequest> getCategoryMappingRequest(List<Long> requestIds, RequestStatus requestStatus, Long loggedInUser) throws Exception {
-        if ((requestIds == null || requestIds.isEmpty()) && requestStatus == null && loggedInUser == null) {
-            throw new IllegalArgumentException("At least one filter (requestIds, requestStatus, loggedInUser) must be provided");
-        }
+//        if ((requestIds == null || requestIds.isEmpty()) && requestStatus == null && loggedInUser == null) {
+//            throw new IllegalArgumentException("At least one filter (requestIds, requestStatus, loggedInUser) must be provided");
+//        }
         return categoryProductMappingRequestDAO.findAllRequest(requestIds, requestStatus, loggedInUser);
     }
 }
