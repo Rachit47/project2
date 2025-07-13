@@ -46,7 +46,7 @@ public class CategoryProductMappingRequestServiceImpl implements CategoryProduct
     }
 
     @Override
-    public void updateMappingRequestStatusService(List<Long> requestIds, Integer approvedBy, RequestStatus status) {
+    public void updateMappingRequestStatusService(List<Long> requestIds, Long approvedBy, RequestStatus status) {
         if (requestIds == null || requestIds.isEmpty()) {
             throw new IllegalArgumentException("RequestIds must not be null or empty");
         }

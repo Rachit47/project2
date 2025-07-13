@@ -23,7 +23,7 @@ export const makeRequest = async (
     urlTemplate
   );
 
-  const needsBody = ["POST", "PUT", "PATCH", "GET"].includes(
+  const needsBody = ["POST", "PUT", "PATCH"].includes(
     method.toUpperCase()
   );
 

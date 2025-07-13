@@ -49,7 +49,7 @@ public class CategoryProductMappingRequestDAOImpl implements CategoryProductMapp
 	}
 
 	@Override
-	public void updateRequestStatus(List<Long> requestIds, Integer approvedBy, RequestStatus status) {
+	public void updateRequestStatus(List<Long> requestIds, Long approvedBy, RequestStatus status) {
 		if (requestIds == null || requestIds.isEmpty())
 			return;
 

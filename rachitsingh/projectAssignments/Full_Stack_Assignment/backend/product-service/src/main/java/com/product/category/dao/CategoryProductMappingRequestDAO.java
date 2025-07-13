@@ -12,7 +12,7 @@ public interface CategoryProductMappingRequestDAO {
 
 	void createMappingRequest(CategoryProductMappingRequest request);
 
-    void updateRequestStatus(List<Long> requestIds, Integer approvedBy, RequestStatus status);
+    void updateRequestStatus(List<Long> requestIds, Long approvedBy, RequestStatus status);
 
     List<CategoryProductMappingRequest> findAllRequest(List<Long> requestIds,RequestStatus requestStatus,Long loggedInUser) throws Exception;
 }

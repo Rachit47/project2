@@ -12,7 +12,7 @@ public interface CategoryProductMappingRequestService {
 	
 	void createCategoryProductMappingRequest(CategoryProductMappingRequest categoryProductMappingRequest);
 	
-	void updateMappingRequestStatusService(List<Long> requestIds, Integer approvedBy, RequestStatus status);
+	void updateMappingRequestStatusService(List<Long> requestIds, Long approvedBy, RequestStatus status);
 	
 	List<CategoryProductMappingRequest> getCategoryMappingRequest(List<Long> requestIds,RequestStatus requestStatus,Long loggedInUser) throws Exception;
 	
