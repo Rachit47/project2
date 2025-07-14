@@ -33,5 +33,22 @@ export const registerUser = async (userData) => {
 };
 
 export const logoutUser = async () => {
-  return makeRequest("POST", "/api/auth/logout", {}, {}, {});
+  try {
+    // Make server request to invalidate token if your backend supports it
+    await makeRequest("POST", "/api/auth/logout", {}, {}, {});
+
+    // Clear token and user from localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    return { success: true };
+  } catch (error) {
+    console.error("Logout error:", error);
+
+    // Even if server logout fails, clear local storage
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    return { success: false, error };
+  }
 };

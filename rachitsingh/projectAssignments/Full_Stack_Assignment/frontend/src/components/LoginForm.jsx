@@ -3,9 +3,11 @@ import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import FormField from "./FormField";
 import { loginUser } from "../services/AuthService";
+import { useAuth } from "../context/AuthContext";
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -27,8 +29,8 @@ const LoginForm = () => {
       const res = await loginUser(formData);
       setResponse({ success: true, message: "Login successful!" });
 
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      localStorage.setItem("token", res.data.token);
+      // Use the login method from AuthContext instead of directly setting localStorage
+      login(res.data.user, res.data.token);
 
       setTimeout(() => {
         navigate("/");
