@@ -3,8 +3,12 @@ import {
   getMappingRequests,
   updateMappingRequestStatus,
 } from "../services/CategoryMappingService";
+import { useAuth } from "../context/AuthContext";
 
-const ViewMappingRequests = () => {
+const ViewCategoryMappingRequests = () => {
+
+  const { currentUser } = useAuth();
+
   const [mappingRequestData, setMappingRequestData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const [requestIds, setRequestIds] = useState("");
@@ -136,7 +140,7 @@ const ViewMappingRequests = () => {
               <td>{request.approvedBy ?? "—"}</td>
               <td>{new Date(request.createdAtDate).toLocaleString()}</td>
               <td>{new Date(request.updatedAtDate).toLocaleString()}</td>
-              {request.status === "PENDING" && (
+              {(request.status === "PENDING" && currentUser?.role === "ROLE_MANAGER") && (
                 <td>
                   <input
                     type="checkbox"
@@ -180,4 +184,4 @@ const ViewMappingRequests = () => {
   );
 };
 
-export default ViewMappingRequests;
+export default ViewCategoryMappingRequests;
