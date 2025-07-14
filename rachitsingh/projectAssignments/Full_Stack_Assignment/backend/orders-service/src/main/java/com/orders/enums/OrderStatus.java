@@ -1,5 +1,8 @@
 package com.orders.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum OrderStatus {
 	DELIVERED("D", "Delivered"), CANCELLED("C", "Cancelled"), PROCESSING("P", "Processing");
 
@@ -11,8 +14,9 @@ public enum OrderStatus {
 		this.label = label;
 	}
 
+	@JsonValue
 	public String getCode() {
-		return code;
+		return code; // This will be used when serializing enum to JSON
 	}
 
 	public String getLabel() {
@@ -35,5 +39,16 @@ public enum OrderStatus {
 			}
 		}
 		throw new IllegalArgumentException("Unknown Order Status code: " + code);
+	}
+
+	@JsonCreator
+	public static OrderStatus fromJson(String input) {
+		for (OrderStatus status : OrderStatus.values()) {
+			if (status.name().equalsIgnoreCase(input) || status.getCode().equalsIgnoreCase(input)
+					|| status.getLabel().equalsIgnoreCase(input)) {
+				return status;
+			}
+		}
+		throw new IllegalArgumentException("Invalid OrderStatus: " + input);
 	}
 }

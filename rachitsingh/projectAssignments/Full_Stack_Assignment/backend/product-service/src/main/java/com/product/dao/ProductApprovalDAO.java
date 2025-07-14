@@ -9,5 +9,5 @@ public interface ProductApprovalDAO {
 	public List<ProductRequest> getRequests(List<Long> productRequestId, Integer flagIds, List<RequestStatus> status,
 			Integer flagStatus);
 
-	public void updateRequest(List<Long> productRequestId, RequestStatus status, Long managerId);
+	public int[] updateRequest(List<Long> productRequestId, RequestStatus status, Long managerId);
 }

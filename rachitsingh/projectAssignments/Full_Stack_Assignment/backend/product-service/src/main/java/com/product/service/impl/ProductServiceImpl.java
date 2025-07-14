@@ -2,9 +2,10 @@ package com.product.service.impl;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.product.dao.impl.ProductDAOImpl;
+import com.product.dao.ProductDAO;
 import com.product.domain.Product;
 import com.product.domain.ProductRequest;
 import com.product.service.ProductService;
@@ -12,12 +13,13 @@ import com.product.service.ProductService;
 @Service
 public class ProductServiceImpl implements ProductService{
 	
-	ProductDAOImpl productDAOImpl;
+	@Autowired
+	private ProductDAO productDAO;
 	
 	@Override
-	public void insertProduct(ProductRequest productRequest) {
-		if (productRequest != null) {
-			productDAOImpl.insertProduct(productRequest);
+	public void insertProduct(List<ProductRequest> productRequest) {
+		if (productRequest != null && productRequest.size() != 0) {
+			productDAO.insertProduct(productRequest);
 		}
 		
 	}
@@ -25,13 +27,13 @@ public class ProductServiceImpl implements ProductService{
 	@Override
 	public List<Product> getProducts(String productName){
 		Integer flagName = 0;
-		if (productName != null || productName.length() != 0) {
+		if (productName != null && !productName.trim().isEmpty()) {
 			flagName = 1;
 		}
 		else {
 			flagName = 0;
 		}
-		return productDAOImpl.getProducts(productName,flagName);
+		return productDAO.getProducts(productName,flagName);
 	}
 
 }

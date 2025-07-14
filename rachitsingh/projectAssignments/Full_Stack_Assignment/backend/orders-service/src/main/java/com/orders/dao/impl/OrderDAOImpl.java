@@ -4,9 +4,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -141,7 +143,6 @@ public class OrderDAOImpl implements OrderDAO {
 		}
 	}
 
-	@Override
 	public List<Order> fetchCustomerOrders(SearchOrderCriteria criteria) throws OrderDatabaseOperationException {
 		String sql = "SELECT OrderId, UserId, Address, TotalAmount, Status, PlacedAtDate, UpdatedAtDate "
 				+ "FROM orders WHERE 1=1 " + "AND (:orderIdsFlag = 0 OR OrderId IN (:orderIds)) "
@@ -187,8 +188,8 @@ public class OrderDAOImpl implements OrderDAO {
 	@Override
 	public void updateMyOrder(SearchOrderCriteria criteria) throws OrderDatabaseOperationException {
 		String sql = "UPDATE orders SET " + "Status = CASE "
-				+ "WHEN (UserId = :userId AND OrderId IN (:orderIds) AND Status = 'P') THEN 'C' " + "ELSE Status END, "
-				+ "Address = CASE "
+				+ "WHEN (:addressFlag = 0 AND UserId = :userId AND OrderId IN (:orderIds) AND Status = 'P') THEN 'C' "
+				+ "ELSE Status END, " + "Address = CASE "
 				+ "WHEN (:addressFlag = 1 AND UserId = :userId AND OrderId IN (:orderIds)) THEN :address "
 				+ "ELSE Address END";
 
