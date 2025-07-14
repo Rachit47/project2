@@ -1,7 +1,8 @@
-package com.user_service.app.dao.impl;
+package com.user.app.dao.impl;
 
-import com.user_service.app.dao.UserDao;
-import com.user_service.app.model.User;
+import com.user.app.dao.UserDao;
+import com.user.app.model.User;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -60,15 +61,22 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> findById(Long userId) {
-        String sql = "SELECT * FROM users WHERE UserId = ?";
+        String sql = "SELECT Username, Email, FullName, Phone, Gender, Age, Password, Role, CreatedAt FROM users WHERE UserId = ?";
         List<User> users = jdbcTemplate.query(sql, new UserRowMapper(), userId);
+        return users.isEmpty() ? Optional.empty() : Optional.of(users.get(0));
+    }
+    
+    @Override
+    public Optional<User> findByEmail(String emailId) {
+        String sql = "SELECT UserId,Username, Email, FullName, Phone, Gender, Age, Password, Role, CreatedAt FROM users WHERE Email = ?";
+        List<User> users = jdbcTemplate.query(sql, new UserRowMapper(), emailId);
         return users.isEmpty() ? Optional.empty() : Optional.of(users.get(0));
     }
 
 
     @Override
     public List<User> findAll() {
-        String sql = "SELECT * FROM users";
+        String sql = "SELECT Username, Email, FullName, Phone, Gender, Age, Password, Role, CreatedAt FROM users";
         return jdbcTemplate.query(sql, new UserRowMapper());
     }
 } 

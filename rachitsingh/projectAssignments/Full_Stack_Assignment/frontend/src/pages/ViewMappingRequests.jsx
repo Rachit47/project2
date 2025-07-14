@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { getMappingRequests, updateMappingRequestStatus } from "../services/CategoryMappingService";
+import {
+  getMappingRequests,
+  updateMappingRequestStatus,
+} from "../services/CategoryMappingService";
 
 const ViewMappingRequests = () => {
   const [mappingRequestData, setMappingRequestData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
-  const [requestIds, setRequestIds] = useState('');
-  const [status, setStatus] = useState('');
-  const [loggedInUser, setLoggedInUser] = useState('');
+  const [requestIds, setRequestIds] = useState("");
+  const [status, setStatus] = useState("");
+  const [loggedInUser, setLoggedInUser] = useState("");
   const [selectedRequests, setSelectedRequests] = useState([]);
 
   const handleCheckboxChange = (requestId) => {
@@ -21,11 +24,11 @@ const ViewMappingRequests = () => {
     try {
       setLoading(true);
       await updateMappingRequestStatus(selectedRequests, 1, newStatus);
-      setSelectedRequests([]); 
-      
-      setRequestIds('');
-      setStatus('');
-      setLoggedInUser('');
+      setSelectedRequests([]);
+
+      setRequestIds("");
+      setStatus("");
+      setLoggedInUser("");
       fetchMappingRequests();
     } catch (error) {
       console.error(`Error updating status to ${newStatus}:`, error);
@@ -37,8 +40,15 @@ const ViewMappingRequests = () => {
   const fetchMappingRequests = async () => {
     try {
       setLoading(true);
-      const parsedRequestIds = requestIds.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
-      const response = await getMappingRequests(parsedRequestIds, status, loggedInUser === '' ? null : parseInt(loggedInUser));
+      const parsedRequestIds = requestIds
+        .split(",")
+        .map((id) => parseInt(id.trim()))
+        .filter((id) => !isNaN(id));
+      const response = await getMappingRequests(
+        parsedRequestIds,
+        status,
+        loggedInUser === "" ? null : parseInt(loggedInUser)
+      );
       setMappingRequestData(response.data);
     } catch (error) {
       console.error("Error fetching mapping requests:", error);
@@ -65,18 +75,9 @@ const ViewMappingRequests = () => {
       <h2>Category-Product Mapping Requests</h2>
       <div className="row mb-3">
         <div className="col-md-4">
-          <label htmlFor="requestIds" className="form-label">Request IDs (comma-separated):</label>
-          <input
-            type="text"
-            className="form-control"
-            id="requestIds"
-            value={requestIds}
-            onChange={(e) => setRequestIds(e.target.value)}
-            placeholder="e.g., 1,2,3"
-          />
-        </div>
-        <div className="col-md-4">
-          <label htmlFor="status" className="form-label">Status:</label>
+          <label htmlFor="status" className="form-label">
+            Status:
+          </label>
           <select
             className="form-select"
             id="status"
@@ -90,20 +91,24 @@ const ViewMappingRequests = () => {
           </select>
         </div>
         <div className="col-md-4">
-          <label htmlFor="loggedInUser" className="form-label">Requested By User ID:</label>
+          <label htmlFor="loggedInUser" className="form-label">
+            Requested By User ID:
+          </label>
           <input
             type="number"
             className="form-control"
             id="loggedInUser"
             value={loggedInUser}
             onChange={(e) => setLoggedInUser(e.target.value)}
-            placeholder="e.g., 123"
+            placeholder="Enter User ID:"
           />
         </div>
       </div>
       <div className="row mb-3">
         <div className="col">
-          <button className="btn btn-primary" onClick={fetchMappingRequests}>Search</button>
+          <button className="btn btn-primary" onClick={fetchMappingRequests}>
+            Search
+          </button>
         </div>
       </div>
       <table border="1" cellPadding="10" className="table table-striped">
@@ -117,7 +122,7 @@ const ViewMappingRequests = () => {
             <th>Approved By</th>
             <th>Created At</th>
             <th>Updated At</th>
-            {status === 'PENDING' && <th>Select</th>}
+            {status === "PENDING" && <th>Select</th>}
           </tr>
         </thead>
         <tbody>
@@ -131,12 +136,16 @@ const ViewMappingRequests = () => {
               <td>{request.approvedBy ?? "—"}</td>
               <td>{new Date(request.createdAtDate).toLocaleString()}</td>
               <td>{new Date(request.updatedAtDate).toLocaleString()}</td>
-              {request.status === 'PENDING' && (
+              {request.status === "PENDING" && (
                 <td>
                   <input
                     type="checkbox"
-                    checked={selectedRequests.includes(request.mappingRequestId)}
-                    onChange={() => handleCheckboxChange(request.mappingRequestId)}
+                    checked={selectedRequests.includes(
+                      request.mappingRequestId
+                    )}
+                    onChange={() =>
+                      handleCheckboxChange(request.mappingRequestId)
+                    }
                   />
                 </td>
               )}
@@ -153,8 +162,18 @@ const ViewMappingRequests = () => {
       </table>
       {selectedRequests.length > 0 && (
         <div className="mt-3">
-          <button className="btn btn-success me-2" onClick={() => handleStatusUpdate('APPROVED')}>Accept Selected</button>
-          <button className="btn btn-danger" onClick={() => handleStatusUpdate('DECLINED')}>Reject Selected</button>
+          <button
+            className="btn btn-success me-2"
+            onClick={() => handleStatusUpdate("APPROVED")}
+          >
+            Accept Selected
+          </button>
+          <button
+            className="btn btn-danger"
+            onClick={() => handleStatusUpdate("DECLINED")}
+          >
+            Reject Selected
+          </button>
         </div>
       )}
     </div>
