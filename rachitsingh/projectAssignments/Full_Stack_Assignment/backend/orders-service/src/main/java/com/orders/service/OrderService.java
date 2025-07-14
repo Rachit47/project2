@@ -4,13 +4,18 @@ import java.util.List;
 
 import com.orders.domain.Order;
 import com.orders.domain.SearchOrderCriteria;
+import com.orders.exceptions.InvalidOrderException;
+import com.orders.exceptions.OrderDatabaseOperationException;
+import com.orders.exceptions.OrderNotFoundException;
 
 public interface OrderService {
-	Order placeNewOrder(Order order);
+	Order placeNewOrder(Order order) throws OrderDatabaseOperationException, InvalidOrderException;
 
-	List<Order> getMyOrders(SearchOrderCriteria criteria);
+	List<Order> getMyOrders(SearchOrderCriteria criteria)
+			throws OrderNotFoundException, OrderDatabaseOperationException;
 
-	Order getOrderDetails(Long orderId, Long customerId);
+	void updateMyOrder(SearchOrderCriteria criteria) throws OrderDatabaseOperationException, InvalidOrderException;
 
-	void updateOrderStatus(Long orderId, Long customerId);;
+	Order getOrderDetails(Long orderId, Long customerId)
+			throws OrderDatabaseOperationException, InvalidOrderException, OrderNotFoundException;
 }

@@ -13,14 +13,17 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
-import com.orders.Exceptions.OrderDatabaseOperationException;
 import com.orders.dao.OrderDAO;
 import com.orders.domain.Order;
-import com.orders.domain.OrderItem;
+import com.orders.item.dao.OrderItemDAO;
+import com.orders.item.domain.OrderItem;
 import com.orders.domain.SearchOrderCriteria;
 import com.orders.enums.OrderStatus;
+import com.orders.exceptions.OrderDatabaseOperationException;
+import com.orders.exceptions.OrderNotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +33,9 @@ public class OrderDAOImpl implements OrderDAO {
 	@Autowired
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+	@Autowired
+	private OrderItemDAO orderItemDAO;
+
 	private static class OrderItemMapper implements RowMapper<OrderItem> {
 		@Override
 		public OrderItem mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -37,6 +43,7 @@ public class OrderDAOImpl implements OrderDAO {
 			item.setOrderItemId(rs.getLong("OrderItemId"));
 			item.setOrderId(rs.getLong("OrderId"));
 			item.setProductId(rs.getLong("ProductId"));
+			item.setProductName(rs.getString("ProductName"));
 			item.setQuantity(rs.getInt("Quantity"));
 			item.setPrice(rs.getBigDecimal("Price"));
 			Timestamp createdTs = rs.getTimestamp("CreatedAtDate");
@@ -71,15 +78,32 @@ public class OrderDAOImpl implements OrderDAO {
 	}
 
 	@Override
-	public Order fetchCustomerOrderWithItems(Long orderId, Long customerId) {
+	public Order fetchCustomerOrderWithItems(Long orderId, Long customerId)
+			throws OrderNotFoundException, OrderDatabaseOperationException {
 		String orderSql = "SELECT OrderId, UserId, Address, TotalAmount, Status, PlacedAtDate, UpdatedAtDate FROM orders WHERE UserId = :customerId AND OrderId = :orderId";
-		MapSqlParameterSource params = new MapSqlParameterSource("orderId", orderId);
-		Order order = namedParameterJdbcTemplate.queryForObject(orderSql, params, new OrderMapper());
 
-		String itemsSql = "SELECT OrderItemId, OrderId, ProductId, Quantity, Price, CreatedAt User FROM order_items WHERE OrderId = :orderId";
-		List<OrderItem> items = namedParameterJdbcTemplate.query(itemsSql, params, new OrderItemMapper());
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("orderId", orderId);
+		params.addValue("customerId", customerId);
 
-		order.setOrderItems(items);
+		Order order;
+		try {
+			order = namedParameterJdbcTemplate.queryForObject(orderSql, params, new OrderMapper());
+		} catch (org.springframework.dao.EmptyResultDataAccessException e) {
+			throw new OrderNotFoundException("No order found for given Order ID and Customer ID.");
+		} catch (DataAccessException e) {
+			log.error("Database error while fetching order", e);
+			throw new OrderDatabaseOperationException("Database error occurred while fetching the order.", e);
+		}
+
+		try {
+			List<OrderItem> items = orderItemDAO.fetchOrderItemsByOrderId(orderId);
+			order.setOrderItems(items);
+		} catch (DataAccessException e) {
+			log.error("Failed to fetch order items", e);
+			throw new OrderDatabaseOperationException("Failed to fetch order items.", e);
+		}
+
 		return order;
 	}
 
@@ -96,9 +120,15 @@ public class OrderDAOImpl implements OrderDAO {
 		params.addValue("status", orderObj.getStatus());
 		params.addValue("placedAtDate", now);
 
+		GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+
 		try {
-			int recordInserted = namedParameterJdbcTemplate.update(sql, params);
+			int recordInserted = namedParameterJdbcTemplate.update(sql, params, keyHolder, new String[] { "OrderId" });
 			if (recordInserted > 0) {
+				Number generatedOrderId = keyHolder.getKey();
+				if (generatedOrderId != null) {
+					orderObj.setOrderId(generatedOrderId.longValue());
+				}
 				orderObj.setStatus(OrderStatus.PROCESSING);
 				orderObj.setPlacedAtDate(now.toLocalDateTime());
 				return orderObj;
@@ -113,13 +143,12 @@ public class OrderDAOImpl implements OrderDAO {
 
 	@Override
 	public List<Order> fetchCustomerOrders(SearchOrderCriteria criteria) throws OrderDatabaseOperationException {
-		StringBuilder sql = new StringBuilder(
-				"SELECT OrderId, UserId, Address, TotalAmount, Status, PlacedAtDate, UpdatedAtDate "
-						+ "FROM orders WHERE 1=1 " + "AND (:orderIdsFlag = 0 OR OrderId IN (:orderIds)) "
-						+ "AND (:orderStatusFlag = 0 OR Status IN (:orderStatuses)) "
-						+ "AND (:fromDateFlag = 0 OR PlacedAtDate >= :fromDate) "
-						+ "AND (:toDateFlag = 0 OR PlacedAtDate <= :toDate) " + "AND UserId = :customerId "
-						+ "ORDER BY PlacedAtDate DESC " + "LIMIT :limit OFFSET :offset");
+		String sql = "SELECT OrderId, UserId, Address, TotalAmount, Status, PlacedAtDate, UpdatedAtDate "
+				+ "FROM orders WHERE 1=1 " + "AND (:orderIdsFlag = 0 OR OrderId IN (:orderIds)) "
+				+ "AND (:orderStatusFlag = 0 OR Status IN (:orderStatuses)) "
+				+ "AND (:fromDateFlag = 0 OR PlacedAtDate >= :fromDate) "
+				+ "AND (:toDateFlag = 0 OR PlacedAtDate <= :toDate) " + "AND UserId = :customerId "
+				+ "ORDER BY PlacedAtDate DESC " + "LIMIT :limit OFFSET :offset";
 
 		Map<String, Object> params = new HashMap<>();
 
@@ -149,7 +178,28 @@ public class OrderDAOImpl implements OrderDAO {
 		params.put("offset", offset);
 
 		try {
-			return namedParameterJdbcTemplate.query(sql.toString(), params, new OrderMapper());
+			return namedParameterJdbcTemplate.query(sql, params, new OrderMapper());
+		} catch (DataAccessException e) {
+			throw new OrderDatabaseOperationException("Failed to fetch orders from the database", e);
+		}
+	}
+
+	@Override
+	public void updateMyOrder(SearchOrderCriteria criteria) throws OrderDatabaseOperationException {
+		String sql = "UPDATE orders SET " + "Status = CASE "
+				+ "WHEN (UserId = :userId AND OrderId IN (:orderIds) AND Status = 'P') THEN 'C' " + "ELSE Status END, "
+				+ "Address = CASE "
+				+ "WHEN (:addressFlag = 1 AND UserId = :userId AND OrderId IN (:orderIds)) THEN :address "
+				+ "ELSE Address END";
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("addressFlag", criteria.getAddress() != null && !criteria.getAddress().trim().isEmpty() ? 1 : 0);
+		params.put("userId", criteria.getCustomerId());
+		params.put("orderIds", criteria.getOrderIds());
+		params.put("address", criteria.getAddress());
+
+		try {
+			namedParameterJdbcTemplate.update(sql, params);
 		} catch (DataAccessException e) {
 			throw new OrderDatabaseOperationException("Failed to fetch orders from the database", e);
 		}
