@@ -1,10 +1,11 @@
 package com.product.category.dao.impl;
 
 import java.sql.ResultSet;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -43,7 +44,24 @@ public class CategoryDAOImpl implements CategoryDAO{
 	public void updateCategoryRequest(List<Long> requests, Integer approvedBy, RequestStatus status) {
 	    if (requests == null || requests.isEmpty()) return;
 	    
-	    String logSql = "insert into category_requests_log values()";
+	    String selectSql = "SELECT CategoryName, RequestedBy, Status, UpdatedAtDate " +
+                "FROM category_requests WHERE CategoryRequestId IN (:requestIds)";
+
+	    List<Map<String, Object>> recordsToLog = namedParameterJdbcTemplate.queryForList(selectSql, Map.of("requestIds", requests));
+
+
+	   String insertLogSql = "INSERT INTO category_request_log (CategoryName, RequestedBy, Status, UpdatedAtDate) " +
+                   "VALUES (:categoryName, :requestedBy, :status, :updatedAtDate)";
+
+	   for (Map<String, Object> row : recordsToLog) {
+		   MapSqlParameterSource logParams = new MapSqlParameterSource();
+		   logParams.addValue("categoryName", row.get("CategoryName"));
+		   logParams.addValue("requestedBy", row.get("RequestedBy"));
+		   logParams.addValue("status", row.get("Status"));
+		   logParams.addValue("updatedAtDate", row.get("UpdatedAtDate"));
+
+		   namedParameterJdbcTemplate.update(insertLogSql, logParams);
+	   }
 
 	    String sql = "UPDATE category_requests " +
 	                 "SET Status = :status, ApprovedBy = :approvedBy, UpdatedAtDate = :updatedAtDate " +
