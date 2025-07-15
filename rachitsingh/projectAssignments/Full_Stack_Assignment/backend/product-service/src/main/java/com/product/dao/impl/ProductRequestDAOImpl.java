@@ -80,7 +80,7 @@ public class ProductRequestDAOImpl implements ProductRequestDAO {
 		params.addValue("qty", requestObj.getQuantity());
 		params.addValue("requestedBy", requestObj.getRequestedBy());
 		params.addValue("createdAt", now);
-		params.addValue("status", requestObj.getStatus().name());
+		params.addValue("status", requestObj.getStatus().getCode());
 
 		try {
 			int recordInserted = namedParameterJdbcTemplate.update(sql, params);
@@ -142,7 +142,7 @@ public class ProductRequestDAOImpl implements ProductRequestDAO {
 		params.addValue("description", RequestToUpdate.getDescription());
 		params.addValue("price", RequestToUpdate.getPrice());
 		params.addValue("qty", RequestToUpdate.getQuantity());
-		params.addValue("updatedAt", Timestamp.valueOf(LocalDateTime.now()));
+		params.addValue("updatedgAt", Timestamp.valueOf(LocalDateTime.now()));
 		params.addValue("requestId", RequestToUpdate.getProductRequestId());
 		params.addValue("pendingStatus", RequestStatus.PENDING.getCode());
 
