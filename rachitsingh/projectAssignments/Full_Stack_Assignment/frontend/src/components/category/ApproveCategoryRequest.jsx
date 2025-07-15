@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { getCategoryRequests, processCategoryRequest } from "../services/CategoryRequestService";
 import { Button, Container, Table, Alert, Form } from "react-bootstrap";
+import {
+  getCategoryRequests,
+  processCategoryRequest,
+} from "../../services/CategoryRequestService";
 
 const ApproveCategoryRequests = () => {
   const [requests, setRequests] = useState([]);
@@ -14,7 +17,7 @@ const ApproveCategoryRequests = () => {
     try {
       setLoading(true);
       const result = await getCategoryRequests(); // Assumes all requests are fetched
-      const pendingOnly = result?.filter(r => r.status === "PENDING") || [];
+      const pendingOnly = result?.filter((r) => r.status === "PENDING") || [];
       setRequests(pendingOnly);
     } catch (error) {
       console.error("Error fetching requests:", error);
@@ -29,40 +32,41 @@ const ApproveCategoryRequests = () => {
   }, []);
 
   const handleSelect = (id) => {
-    setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
   };
 
   const handleSubmit = async (status) => {
-  setErrorMsg(null);
-  setResponseMsg(null);
+    setErrorMsg(null);
+    setResponseMsg(null);
 
-  if (!approvedBy || selectedIds.length === 0) {
-    setErrorMsg("Please provide Admin ID and select at least one request.");
-    return;
+    if (!approvedBy || selectedIds.length === 0) {
+      setErrorMsg("Please provide Admin ID and select at least one request.");
+      return;
+    }
+
+    try {
+      await processCategoryRequest({
+        requestIds: selectedIds,
+        approvedBy: parseInt(approvedBy),
+        status,
+      });
+
+      setResponseMsg(`Category requests ${status.toLowerCase()} successfully.`);
+      setSelectedIds([]);
+      fetchPendingRequests(); // Refresh table
+    } catch (error) {
+      console.error("Process Error:", error);
+      setErrorMsg(
+        error.response?.data?.message || "Failed to process category requests."
+      );
+    }
+  };
+
+  if (loading) {
+    return <div className="text-center mt-5">Loading...</div>;
   }
-
-  try {
-    await processCategoryRequest({
-      requestIds: selectedIds,
-      approvedBy: parseInt(approvedBy),
-      status
-    });
-
-    setResponseMsg(`Category requests ${status.toLowerCase()} successfully.`);
-    setSelectedIds([]);
-    fetchPendingRequests(); // Refresh table
-  } catch (error) {
-    console.error("Process Error:", error);
-    setErrorMsg(
-      error.response?.data?.message ||
-      "Failed to process category requests."
-    );
-  }
-};
-
-
   return (
     <Container className="mt-4">
       <h2>Approve Category Requests</h2>
@@ -122,7 +126,6 @@ const ApproveCategoryRequests = () => {
           Approve Selected
         </Button>
         <Button variant="danger" onClick={() => handleSubmit("DECLINED")}>
-
           Reject Selected
         </Button>
       </div>

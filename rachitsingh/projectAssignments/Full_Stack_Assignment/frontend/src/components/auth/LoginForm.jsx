@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router";
-import FormField from "./FormField";
-import { loginUser } from "../services/AuthService";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
+import FormField from "../FormField";
+import { loginUser } from "../../services/AuthService";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      const res = await loginUser(formData);
+      const res = await loginUser(formData,"http://localhost:8081");
       setResponse({ success: true, message: "Login successful!" });
 
       // Use the login method from AuthContext instead of directly setting localStorage

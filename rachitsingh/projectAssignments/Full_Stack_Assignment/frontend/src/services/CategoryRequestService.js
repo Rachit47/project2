@@ -10,8 +10,6 @@ export const createCategoryRequest = (requestData) => {
   return makeRequest("POST", "/categories/request", {}, {}, requestData);
 };
 
-import axios from "axios";
-
 
 
 

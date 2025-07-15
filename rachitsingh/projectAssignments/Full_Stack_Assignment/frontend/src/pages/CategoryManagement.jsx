@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Container, Tabs, Tab } from "react-bootstrap";
-import CreateCategoryRequestForm from "../components/CreateCategoryRequestForm";
-import ViewCategoryRequests from "../components/ViewCategoryRequests";
-import ApproveCategoryRequests from "../components/ApproveCategoryRequest";
+import CreateCategoryRequestForm from "../components/category/CreateCategoryRequestForm";
+import ViewCategoryRequests from "../components/category/ViewCategoryRequests";
+import ApproveCategoryRequests from "../components/category/ApproveCategoryRequest";
 import ViewCategories from "../components/ViewCategories";
 
 const CategoryManagement = () => {

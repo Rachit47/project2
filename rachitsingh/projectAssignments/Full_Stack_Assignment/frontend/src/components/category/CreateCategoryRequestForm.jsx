@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
-import FormField from "../components/FormField";
-import { createCategoryRequest } from "../services/CategoryRequestService";
+import { createCategoryRequest } from "../../services/CategoryRequestService";
 
 const CreateCategoryRequestForm = () => {
   const [categoryName, setCategoryName] = useState("");

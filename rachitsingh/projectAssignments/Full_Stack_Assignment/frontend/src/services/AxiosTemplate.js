@@ -5,7 +5,6 @@ const axiosInstance = axios.create({
   timeout: 10000,
 });
 
-// Add request interceptor to include JWT token in headers
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -30,21 +29,21 @@ export const makeRequest = async (
   urlTemplate,
   pathVars = {},
   queryParams = {},
-  body = {}
+  body = {},
+  baseURL = "http://localhost:8080"
 ) => {
   const resolvedUrl = Object.entries(pathVars).reduce(
     (url, [key, value]) => url.replace(`:${key}`, encodeURIComponent(value)),
     urlTemplate
   );
 
-  const needsBody = ["POST", "PUT", "PATCH"].includes(
-    method.toUpperCase()
-  );
+  const needsBody = ["POST", "PUT", "PATCH"].includes(method.toUpperCase());
 
   try {
     const response = await axiosInstance.request({
       method,
       url: resolvedUrl,
+      baseURL,
       params: queryParams,
       data: needsBody ? body : undefined,
       withCredentials: true,
@@ -59,3 +58,4 @@ export const makeRequest = async (
     throw err;
   }
 };
+

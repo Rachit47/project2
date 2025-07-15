@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getCategoryRequests } from "../services/CategoryRequestService";
+import { getCategoryRequests } from "../../services/CategoryRequestService";
 
 const ViewCategoryRequests = () => {
   const [requestData, setRequestData] = useState([]);

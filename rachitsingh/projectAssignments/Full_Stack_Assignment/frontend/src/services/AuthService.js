@@ -1,6 +1,6 @@
 import { makeRequest } from "./AxiosTemplate";
 
-export const loginUser = async (credentials) => {
+export const loginUser = async (credentials, baseURL) => {
   return makeRequest(
     "POST",
     "/api/auth/login",
@@ -9,11 +9,12 @@ export const loginUser = async (credentials) => {
     {
       email: credentials.email,
       password: credentials.password,
-    }
+    },
+    baseURL
   );
 };
 
-export const registerUser = async (userData) => {
+export const registerUser = async (userData, baseURL) => {
   return makeRequest(
     "POST",
     "/api/auth/register",
@@ -28,16 +29,15 @@ export const registerUser = async (userData) => {
       gender: userData.gender,
       age: userData.age,
       role: "ROLE_USER",
-    }
+    },
+    baseURL
   );
 };
 
-export const logoutUser = async () => {
+export const logoutUser = async (baseURL) => {
   try {
-    // Make server request to invalidate token if your backend supports it
-    await makeRequest("POST", "/api/auth/logout", {}, {}, {});
+    await makeRequest("POST", "/api/auth/logout", {}, {}, {}, baseURL);
 
-    // Clear token and user from localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
@@ -45,7 +45,6 @@ export const logoutUser = async () => {
   } catch (error) {
     console.error("Logout error:", error);
 
-    // Even if server logout fails, clear local storage
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router";
-import FormField from "./FormField";
-import { registerUser } from "../services/AuthService";
+import { registerUser } from "../../services/AuthService";
+import FormField from "../FormField";
 
 const SignupForm = () => {
   const navigate = useNavigate();
@@ -59,7 +59,7 @@ const SignupForm = () => {
         gender: formData.gender,
         age: parseInt(formData.age, 10),
         password: formData.password,
-      });
+      }, "http://localhost:8081");
 
       setResponse({
         success: true,
