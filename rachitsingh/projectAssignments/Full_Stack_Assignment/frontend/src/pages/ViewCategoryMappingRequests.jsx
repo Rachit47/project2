@@ -17,6 +17,7 @@ const ViewCategoryMappingRequests = () => {
   const [selectedRequests, setSelectedRequests] = useState([]);
 
   const handleCheckboxChange = (requestId) => {
+    
     setSelectedRequests((prevSelectedRequests) =>
       prevSelectedRequests.includes(requestId)
         ? prevSelectedRequests.filter((id) => id !== requestId)
@@ -27,7 +28,7 @@ const ViewCategoryMappingRequests = () => {
   const handleStatusUpdate = async (newStatus) => {
     try {
       setLoading(true);
-      await updateMappingRequestStatus(selectedRequests, 1, newStatus);
+      await updateMappingRequestStatus(selectedRequests, currentUser.userId , newStatus);
       setSelectedRequests([]);
 
       setRequestIds("");

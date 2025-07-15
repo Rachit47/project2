@@ -5,6 +5,8 @@ import OrdersPage from "./pages/OrdersPage";
 import CategoryManagementPage from "./pages/CategoryManagement";
 import CreateCategoryRequest from "./components/category/CreateCategoryRequest";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CategoryMappingManagement from "./pages/CategoryMappingManagement";
+import CategoryMappingManagement from "./pages/CategoryMappingManagement";
 import ProductRequestDashboard from "./pages/ProductRequestDashBoard";
 
 const Home = React.lazy(() => import("./pages/Home"));
@@ -48,31 +50,16 @@ const EcomRoutes = () => {
           }
         >
           <Route
-            path="category/category-management"
+            path="category/dashboard"
             element={<CategoryManagementPage />}
-          />
-          <Route
-            path="category/create-category-request"
-            element={<CreateCategoryRequest />}
-          />
-          <Route
-            path="category/view-category-requests"
-            element={<ViewCategoryRequests />}
-          />
-          <Route path="category/view-categories" element={<ViewCategories />} />
-          <Route
-            path="category/approve-category-requests"
-            element={<ApproveCategoryRequests />}
           />
 
           {/*routes for mapping requests */}
+
+
           <Route
-            path="categorymapping/create-mapping-request"
-            element={<CreateCategoryMappingRequest />}
-          />
-          <Route
-            path="categorymapping/view-mapping-requests"
-            element={<ViewCategoryMappingRequests />}
+            path="categorymapping/dashboard"
+            element={<CategoryMappingManagement />}
           />
         </Route>
 

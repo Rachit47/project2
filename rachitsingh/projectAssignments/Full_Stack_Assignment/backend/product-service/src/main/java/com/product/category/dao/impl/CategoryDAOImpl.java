@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class CategoryDAOImpl implements CategoryDAO{
 	    String selectSql = "SELECT CategoryName, RequestedBy, Status, UpdatedAtDate " +
                 "FROM category_requests WHERE CategoryRequestId IN (:requestIds)";
 
-	    List<Map<String, Object>> recordsToLog = namedParameterJdbcTemplate.queryForList(selectSql, Map.of("requestIds", requests));
+	    List<Map<String, Object>> recordsToLog = namedParameterJdbcTemplate.queryForList(selectSql, Collections.singletonMap("requestIds", requests));
 
 
 	   String insertLogSql = "INSERT INTO category_request_log (CategoryName, RequestedBy, Status, UpdatedAtDate) " +

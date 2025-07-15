@@ -29,19 +29,22 @@ const Navbar = () => {
                 <Nav.Link as={Link} to="/product-approval">
                   Product Approval
                 </Nav.Link>
-                <Nav.Link as={Link} to="/category/category-management">
+                <Nav.Link as={Link} to="/category/dashboard">
                   Category Management
                 </Nav.Link>
-                <Nav.Link as={Link} to="/categorymapping/view-mapping-requests">
-                  Mapping Requests
+                <Nav.Link as={Link} to="/categorymapping/dashboard">
+                  Category Mapping Management
                 </Nav.Link>
               </>
             )}
 
             {isAuthenticated && currentUser?.role === "ROLE_CATEGORY_EXE" && (
               <>
-                <Nav.Link as={Link} to="/category/category-management">
+                <Nav.Link as={Link} to="/category/dashboard">
                   Category Management
+                </Nav.Link>
+                <Nav.Link as={Link} to="/categorymapping/dashboard">
+                  Category Mapping Management
                 </Nav.Link>
               </>
             )}

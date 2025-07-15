@@ -4,9 +4,11 @@ import CreateCategoryRequestForm from "../components/category/CreateCategoryRequ
 import ViewCategoryRequests from "../components/category/ViewCategoryRequests";
 import ApproveCategoryRequests from "../components/category/ApproveCategoryRequest";
 import ViewCategories from "../components/ViewCategories";
+import { useAuth } from "../context/AuthContext";
 
 const CategoryManagement = () => {
   const [key, setKey] = useState("create");
+  const {  currentUser } = useAuth();
 
   return (
     <Container className="mt-4">
@@ -18,17 +20,21 @@ const CategoryManagement = () => {
         className="mb-3"
         justify
       >
+        {currentUser?.role === "ROLE_CATEGORY_EXE" && (
         <Tab eventKey="create" title="Create Request">
           <CreateCategoryRequestForm />
         </Tab>
+        )}
 
         <Tab eventKey="viewRequests" title="View Requests">
           <ViewCategoryRequests />
         </Tab>
 
+        {currentUser?.role === "ROLE_MANAGER" && (
         <Tab eventKey="approveRequests" title="Approve Requests">
           <ApproveCategoryRequests />
         </Tab>
+        )}
 
         <Tab eventKey="viewCategories" title="View Categories">
           <ViewCategories />

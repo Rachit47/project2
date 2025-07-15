@@ -75,12 +75,12 @@ public class CategoryServiceImpl implements CategoryService {
 								"No category request found for request ID: " + requestId);
 					}
 
-					for (CategoryRequest req : requests) {
-						if (req.getCategoryName() != null && !req.getCategoryName().trim().isEmpty()) {
-							allCategoryNames.add(req.getCategoryName().trim());
-						}
-					}
-				}
+	                for (CategoryRequest req : requests) {
+	                    if (req.getCategoryName() != null && !req.getCategoryName().trim().isEmpty()) {
+	                        allCategoryNames.add(req.getCategoryName().trim());
+	                    }
+	                }
+	            }
 
 				List<String> uniqueCategoryNames = allCategoryNames.stream().distinct().collect(Collectors.toList());
 

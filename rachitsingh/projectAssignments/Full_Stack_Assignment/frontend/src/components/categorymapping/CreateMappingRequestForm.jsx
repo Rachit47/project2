@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
 import FormField from "../FormField";
 import { createMappingRequest } from "../../services/CategoryMappingService";
+import { useAuth } from "../../context/AuthContext";
 
 const CreateMappingRequestForm = () => {
   const [formData, setFormData] = useState({
     categoryId: "",
     productId: "",
-    requestedBy: "",
   });
+  const { currentUser } = useAuth();
 
   const [response, setResponse] = useState({ success: null, message: "" });
 
@@ -20,7 +21,10 @@ const CreateMappingRequestForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createMappingRequest(formData);
+      await createMappingRequest({
+        ...formData,
+        requestedBy: currentUser.userId,
+      });
       setResponse({
         success: true,
         message: "Mapping request submitted successfully.",

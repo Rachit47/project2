@@ -37,19 +37,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> getUserById(Long userId) {
+    public Optional<User> getUserById(Long userId) throws Exception {
         return userDao.findById(userId);
     }
     
     @Override
-    public Optional<User> login(String emailId, String rawPassword) {
+    public Optional<User> login(String emailId, String rawPassword) throws Exception{
     	validateLoginInput(emailId,rawPassword);
     	Optional<User> userOpt = userDao.findByEmail(emailId);
     	
     	if (userOpt.isPresent()) {
             User user = userOpt.get();
 
-            if (passwordEncoder.matches(rawPassword, user.getPassword())) {
+            if (passwordEncoder.matches(rawPassword, user.getPassword())){
                 return Optional.of(user);
             }
         }
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAllUsers() throws Exception{
         return userDao.findAll();
     }
 
