@@ -66,9 +66,10 @@ public class ProductRequestDAOImpl implements ProductRequestDAO {
 	@Override
 	public ProductRequest createProductRequest(ProductRequest requestObj) throws ProductDatabaseOperationException {
 		requestObj.setStatus(RequestStatus.PENDING);
+
 		String sql = "INSERT INTO product_requests "
-				+ "(ProductName, Description, Price, Quantity, RequestedBy, CreatedAtDate) "
-				+ "VALUES (:name, :description, :price, :qty, :requestedBy, :createdAt)";
+				+ "(ProductName, Description, Price, Quantity, RequestedBy, CreatedAtDate, Status) "  // ✅ Include Status
+				+ "VALUES (:name, :description, :price, :qty, :requestedBy, :createdAt, :status)";
 
 		Timestamp now = Timestamp.valueOf(LocalDateTime.now());
 
@@ -79,11 +80,12 @@ public class ProductRequestDAOImpl implements ProductRequestDAO {
 		params.addValue("qty", requestObj.getQuantity());
 		params.addValue("requestedBy", requestObj.getRequestedBy());
 		params.addValue("createdAt", now);
+		params.addValue("status", requestObj.getStatus().name());
 
 		try {
 			int recordInserted = namedParameterJdbcTemplate.update(sql, params);
+
 			if (recordInserted > 0) {
-				requestObj.setStatus(RequestStatus.PENDING);
 				requestObj.setCreatedAtDate(now.toLocalDateTime());
 				return requestObj;
 			} else {
@@ -94,6 +96,7 @@ public class ProductRequestDAOImpl implements ProductRequestDAO {
 			throw new ProductDatabaseOperationException("Database error occurred while creating product request", e);
 		}
 	}
+
 
 	@Override
 	public List<ProductRequest> fetchByCriteria(SearchProductRequestCriteria criteria)

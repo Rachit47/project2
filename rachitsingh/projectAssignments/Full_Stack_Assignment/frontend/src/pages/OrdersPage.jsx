@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import OrderTable from "../components/OrderTable";
 import OrderCard from "../components/OrderCard";
- 
+
 import {
   fetchOrdersByCriteria,
   fetchOrderDetails,
@@ -13,10 +13,9 @@ const OrdersPage = () => {
   const statusLabels = {
     P: "Processing",
     C: "Cancelled",
-    D: "Delivered",
   };
 
-  const statusOptions = ["P", "C", "D"];
+  const statusOptions = ["P", "C"];
 
   const [orderIdsList, setOrderIdsList] = useState([]);
   const [filters, setFilters] = useState({
@@ -27,7 +26,7 @@ const OrdersPage = () => {
   });
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const {currentUser} = useAuth();
+  const { currentUser } = useAuth();
   const customerId = currentUser.userId;
 
   const [pageNumber, setPageNumber] = useState(0);
@@ -234,7 +233,10 @@ const OrdersPage = () => {
             <button className="btn btn-primary btn-sm" onClick={applyFilters}>
               Search
             </button>
-            <button className="btn btn-outline-light btn-sm" onClick={handleReset}>
+            <button
+              className="btn btn-outline-light btn-sm"
+              onClick={handleReset}
+            >
               Reset
             </button>
           </div>

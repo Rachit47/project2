@@ -23,17 +23,16 @@ const Navbar = () => {
             <Nav.Link as={Link} to="/">
               Home
             </Nav.Link>
-
             {isAuthenticated && currentUser?.role === "ROLE_MANAGER" && (
               <>
                 <Nav.Link as={Link} to="/product-approval">
-                  Product Approval
+                  Product dashboard
                 </Nav.Link>
                 <Nav.Link as={Link} to="/category/dashboard">
-                  Category Management
+                  Category dashboard
                 </Nav.Link>
                 <Nav.Link as={Link} to="/categorymapping/dashboard">
-                  Category Mapping Management
+                  Category Mapping dashboard
                 </Nav.Link>
               </>
             )}
@@ -41,26 +40,31 @@ const Navbar = () => {
             {isAuthenticated && currentUser?.role === "ROLE_CATEGORY_EXE" && (
               <>
                 <Nav.Link as={Link} to="/category/dashboard">
-                  Category Management
+                  Category dashboard
                 </Nav.Link>
                 <Nav.Link as={Link} to="/categorymapping/dashboard">
-                  Category Mapping Management
+                  Category Mapping dashboard
                 </Nav.Link>
               </>
             )}
 
             {isAuthenticated && currentUser?.role === "ROLE_PRODUCT_EXE" && (
               <>
-                <Nav.Link as={Link} to="/product-approval">
-                  Product Approval
+                <Nav.Link as={Link} to="/product-requests">
+                  Product dashboard
                 </Nav.Link>
               </>
             )}
 
-            {isAuthenticated && (
-              <Nav.Link as={Link} to="/orders">
-                Orders
-              </Nav.Link>
+            {isAuthenticated && currentUser?.role === "ROLE_USER" && (
+              <>
+                <Nav.Link as={Link} to="/orders">
+                  Orders
+                </Nav.Link>
+                {/* <Nav.Link as={Link} to="/">
+                  Home
+                </Nav.Link> */}
+              </>
             )}
           </Nav>
 
