@@ -6,7 +6,9 @@ const getRandomImage = (seed) => `https://picsum.photos/seed/${seed}/400/300`;
 const PAGE_SIZE = 6; // Number of products per page
 
 const Home = () => {
-  const [categories, setCategories] = useState([{ categoryId: 0, categoryName: "All" }]);
+  const [categories, setCategories] = useState([
+    { categoryId: 0, categoryName: "All" },
+  ]);
   const [selectedCategoryId, setSelectedCategoryId] = useState(0);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -64,7 +66,13 @@ const Home = () => {
   const handlePageClick = (page) => setCurrentPage(page);
 
   return (
-    <div style={{ fontFamily: "Arial, sans-serif", background: "#f5f5f5", minHeight: "100vh" }}>
+    <div
+      style={{
+        fontFamily: "Arial, sans-serif",
+        background: "#f5f5f5",
+        minHeight: "100vh",
+      }}
+    >
       <main style={{ maxWidth: 1200, margin: "2rem auto", padding: "0 1rem" }}>
         {/* Category Filter */}
         <div
@@ -75,7 +83,10 @@ const Home = () => {
             alignItems: "center",
           }}
         >
-          <label htmlFor="category-filter" style={{ marginRight: 8, fontWeight: "bold" }}>
+          <label
+            htmlFor="category-filter"
+            style={{ marginRight: 8, fontWeight: "bold" }}
+          >
             Filter by Category:
           </label>
           <select
@@ -98,7 +109,9 @@ const Home = () => {
 
         {/* Products List */}
         {loading ? (
-          <div style={{ textAlign: "center", color: "#888", fontSize: 18 }}>Loading products...</div>
+          <div style={{ textAlign: "center", color: "#888", fontSize: 18 }}>
+            Loading products...
+          </div>
         ) : (
           <>
             <div
@@ -129,8 +142,16 @@ const Home = () => {
                       borderRadius: 6,
                     }}
                   />
-                  <h3 style={{ margin: "1rem 0 0.5rem 0", color: "#222" }}>{product.productName}</h3>
-                  <p style={{ color: "#27ae60", fontWeight: "bold", fontSize: "1.1rem" }}>
+                  <h3 style={{ margin: "1rem 0 0.5rem 0", color: "#222" }}>
+                    {product.productName}
+                  </h3>
+                  <p
+                    style={{
+                      color: "#27ae60",
+                      fontWeight: "bold",
+                      fontSize: "1.1rem",
+                    }}
+                  >
                     ₹{product.price}
                   </p>
                   <button
@@ -152,7 +173,14 @@ const Home = () => {
             </div>
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div style={{ display: "flex", justifyContent: "center", margin: "2rem 0 0 0", gap: 8 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  margin: "2rem 0 0 0",
+                  gap: 8,
+                }}
+              >
                 <button
                   onClick={handlePrev}
                   disabled={currentPage === 1}
@@ -191,7 +219,8 @@ const Home = () => {
                     borderRadius: 4,
                     border: "1px solid #ccc",
                     background: currentPage === totalPages ? "#eee" : "#fff",
-                    cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+                    cursor:
+                      currentPage === totalPages ? "not-allowed" : "pointer",
                   }}
                 >
                   Next

@@ -6,7 +6,6 @@ import CategoryManagementPage from "./pages/CategoryManagement";
 import CreateCategoryRequest from "./components/category/CreateCategoryRequest";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CategoryMappingManagement from "./pages/CategoryMappingManagement";
-import CategoryMappingManagement from "./pages/CategoryMappingManagement";
 import ProductRequestDashboard from "./pages/ProductRequestDashBoard";
 
 const Home = React.lazy(() => import("./pages/Home"));
