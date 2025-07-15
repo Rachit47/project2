@@ -7,6 +7,7 @@ import CreateCategoryRequest from "./components/category/CreateCategoryRequest";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CategoryMappingManagement from "./pages/CategoryMappingManagement";
 import ProductRequestDashboard from "./pages/ProductRequestDashBoard";
+import CartPage from "./pages/CartsPage";
 
 const Home = React.lazy(() => import("./pages/Home"));
 const ViewCategoryMappingRequests = React.lazy(() =>
@@ -37,6 +38,7 @@ const EcomRoutes = () => {
         {/* Protected Routes for all authenticated users */}
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Home />} />
+          <Route path="/cart" element={<CartPage />} />
           <Route path="/orders" element={<OrdersPage />} />
         </Route>
 
@@ -65,10 +67,9 @@ const EcomRoutes = () => {
         <Route element={<ProtectedRoute allowedRoles={["ROLE_MANAGER"]} />}>
           <Route path="/product-approval" element={<ProductApprovalDashboard />} />
         </Route>
-         {/* <Route element={<ProtectedRoute allowedRoles={["ROLE_PRODUCT_EXE"]} />}>
+         <Route element={<ProtectedRoute allowedRoles={["ROLE_PRODUCT_EXE"]} />}>
           <Route path="/product-requests" element={<ProductRequestDashboard />} />
-        </Route> */}
-        <Route path="/product-requests" element={<ProductRequestDashboard />} />
+        </Route>
       </Routes>
     </Suspense>
   );
