@@ -1,5 +1,6 @@
 package com.orders.service.impl;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.dao.DataAccessException;
@@ -44,10 +45,7 @@ public class OrderServiceImpl implements OrderService {
 			throws OrderNotFoundException, OrderDatabaseOperationException {
 		try {
 			List<Order> orders = orderDAO.fetchCustomerOrders(criteria);
-			if (orders == null || orders.isEmpty()) {
-				throw new OrderNotFoundException("No orders found for the given criteria.");
-			}
-			return orders;
+			return orders != null ? orders : Collections.emptyList();
 		} catch (DataAccessException e) {
 			log.error("Error while fetching customer orders.", e);
 			throw new OrderDatabaseOperationException("Error while fetching customer orders.", e);

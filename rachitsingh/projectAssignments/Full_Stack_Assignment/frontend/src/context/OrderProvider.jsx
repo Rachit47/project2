@@ -1,6 +1,5 @@
 import React, { useReducer } from "react";
 import { OrderContext } from "./OrderContext";
-
 const initialState = {
   orders: [],
   loading: false,

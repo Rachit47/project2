@@ -5,7 +5,7 @@ import {
   fetchOrdersByCriteria,
   fetchOrderDetails,
   updateOrder,
-} from "../api/orders";
+} from "../services/orders";
 
 const OrdersPage = () => {
   const statusLabels = {
@@ -14,8 +14,9 @@ const OrdersPage = () => {
     D: "Delivered",
   };
 
+  const statusOptions = ["P", "C", "D"];
+
   const [orderIdsList, setOrderIdsList] = useState([]);
-  const [statusOptions, setStatusOptions] = useState(["P", "C", "D"]);
   const [filters, setFilters] = useState({
     orderIds: [],
     statuses: [],
@@ -26,30 +27,49 @@ const OrdersPage = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const customerId = 5;
 
-  const fetchOrders = async () => {
-    const criteria = {
-      customerId,
-      pageNumber: 0,
-      pageSize: 10,
-    };
+  const [pageNumber, setPageNumber] = useState(0);
+  const [pageSize] = useState(10);
+  const [hasMore, setHasMore] = useState(true);
 
+  const buildCriteria = () => {
+    return {
+      customerId,
+      orderIds: filters.orderIds.length ? filters.orderIds.map(Number) : null,
+      orderStatuses: filters.statuses.length ? filters.statuses : null,
+      fromDate: filters.fromDate ? filters.fromDate + "T00:00:00" : null,
+      toDate: filters.toDate ? filters.toDate + "T23:59:59" : null,
+      pageNumber,
+      pageSize,
+      orderIdsFlag: filters.orderIds.length ? 1 : 0,
+      orderStatusFlag: filters.statuses.length ? 1 : 0,
+      fromDateFlag: filters.fromDate ? 1 : 0,
+      toDateFlag: filters.toDate ? 1 : 0,
+    };
+  };
+
+  const fetchOrders = async () => {
     try {
-      const res = await fetchOrdersByCriteria(criteria);
+      const res = await fetchOrdersByCriteria(buildCriteria());
       if (Array.isArray(res.data)) {
         setOrders(res.data);
+        setHasMore(res.data.length === pageSize);
       } else {
-        console.error("Expected array but got:", res.data);
         setOrders([]);
+        setHasMore(false);
       }
     } catch (err) {
       console.error("Error fetching orders:", err);
       setOrders([]);
+      setHasMore(false);
     }
   };
 
   useEffect(() => {
     fetchOrders();
-    fetchOrdersByCriteria({ customerId, pageSize: 100 })
+  }, [pageNumber]);
+
+  useEffect(() => {
+    fetchOrdersByCriteria({ customerId, pageNumber: 0, pageSize: 100 })
       .then((res) => {
         if (Array.isArray(res.data)) {
           const uniqueIds = [...new Set(res.data.map((o) => o.orderId))];
@@ -80,7 +100,7 @@ const OrdersPage = () => {
       };
 
       await updateOrder(payload);
-      await fetchOrders();
+      fetchOrders();
       setSelectedOrder(null);
       alert("Order cancelled successfully!");
     } catch (err) {
@@ -99,7 +119,7 @@ const OrdersPage = () => {
       };
 
       await updateOrder(payload);
-      await fetchOrders();
+      fetchOrders();
       setSelectedOrder(null);
       alert("Address updated successfully!");
     } catch (err) {
@@ -108,32 +128,14 @@ const OrdersPage = () => {
     }
   };
 
-  const applyFilters = async () => {
-    const criteria = {
-      customerId,
-      orderIds: filters.orderIds.length ? filters.orderIds.map(Number) : null,
-      orderStatuses: filters.statuses.length > 0 ? filters.statuses : null,
-      fromDate: filters.fromDate || null,
-      toDate: filters.toDate || null,
-      pageNumber: 0,
-      pageSize: 10,
-    };
-
-    try {
-      const res = await fetchOrdersByCriteria(criteria);
-      if (Array.isArray(res.data)) {
-        setOrders(res.data);
-      } else {
-        setOrders([]);
-      }
-    } catch (err) {
-      console.error("Error applying filters:", err);
-      setOrders([]);
-    }
+  const applyFilters = () => {
+    setPageNumber(0);
+    fetchOrders();
   };
 
   const handleReset = () => {
     setFilters({ orderIds: [], statuses: [], fromDate: "", toDate: "" });
+    setPageNumber(0);
     fetchOrders();
   };
 
@@ -242,6 +244,24 @@ const OrdersPage = () => {
         onCancel={handleCancel}
         statusLabels={statusLabels}
       />
+
+      <div className="d-flex justify-content-between align-items-center mt-3">
+        <button
+          className="btn btn-outline-light btn-sm"
+          onClick={() => setPageNumber((p) => Math.max(p - 1, 0))}
+          disabled={pageNumber === 0}
+        >
+          Previous
+        </button>
+        <span>Page {pageNumber + 1}</span>
+        <button
+          className="btn btn-outline-light btn-sm"
+          onClick={() => hasMore && setPageNumber((p) => p + 1)}
+          disabled={!hasMore}
+        >
+          Next
+        </button>
+      </div>
 
       {selectedOrder && (
         <div

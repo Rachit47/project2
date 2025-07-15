@@ -164,7 +164,11 @@ public class OrderDAOImpl implements OrderDAO {
 		params.put("toDateFlag", toDateFlag);
 
 		params.put("orderIds", criteria.getOrderIds());
-		params.put("orderStatuses", criteria.getOrderStatuses());
+		List<String> statusCodes = null;
+		if (criteria.getOrderStatuses() != null && !criteria.getOrderStatuses().isEmpty()) {
+			statusCodes = criteria.getOrderStatuses().stream().map(OrderStatus::getCode).collect(Collectors.toList());
+		}
+		params.put("orderStatuses", statusCodes);
 		params.put("fromDate", criteria.getFromDate());
 		params.put("toDate", criteria.getToDate());
 

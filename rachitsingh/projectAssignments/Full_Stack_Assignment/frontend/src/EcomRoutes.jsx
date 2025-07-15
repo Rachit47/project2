@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { Route, Routes } from "react-router";
 import CreateCategoryMappingRequest from "./pages/CreateCategoryMappingRequest";
-import OrdersPage from "./modules/orders/pages/OrdersPage";
+import OrdersPage from "./pages/OrdersPage";
 import CategoryManagementPage from "./pages/CategoryManagement";
 import CreateCategoryRequest from "./components/category/CreateCategoryRequest";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -30,7 +30,8 @@ const EcomRoutes = () => {
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/product-approval" element={<ProductApprovalDashboard />} />
         {/* Protected Routes for all authenticated users */}
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Home />} />
@@ -74,18 +75,12 @@ const EcomRoutes = () => {
           />
         </Route>
 
-        <Route
-          element={
-            <ProtectedRoute
-              allowedRoles={["ROLE_PRODUCT_EXE", "ROLE_MANAGER"]}
-            />
-          }
-        >
-          <Route
-            path="/product-approval"
-            element={<ProductApprovalDashboard />}
-          />
+        <Route element={<ProtectedRoute allowedRoles={["ROLE_MANAGER"]} />}>
+          <Route path="/product-approval" element={<ProductApprovalDashboard />} />
         </Route>
+         {/* <Route element={<ProtectedRoute allowedRoles={["ROLE_PRODUCT_EXE"]} />}>
+          <Route path="/product-request" element={<ProductRequestDashboard />} />
+        </Route> */}
       </Routes>
     </Suspense>
   );

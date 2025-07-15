@@ -16,7 +16,7 @@ public enum OrderStatus {
 
 	@JsonValue
 	public String getCode() {
-		return code; // This will be used when serializing enum to JSON
+		return code;
 	}
 
 	public String getLabel() {

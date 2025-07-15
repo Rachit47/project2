@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8080/api/order-service";
+const BASE_URL = "http://localhost:8082/api/order-service";
 
 export function fetchOrdersByCriteria(criteria) {
   return axios.post(`${BASE_URL}/search`, criteria, {

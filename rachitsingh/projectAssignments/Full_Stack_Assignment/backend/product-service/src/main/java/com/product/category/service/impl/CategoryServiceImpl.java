@@ -52,55 +52,53 @@ public class CategoryServiceImpl implements CategoryService {
 			throw new CategoryRequestDatabaseOperationException("Failed to create category request.", e);
 		}
 	}
-	
+
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void processCategoryRequest(List<Long> requestIds, Integer approvedBy, RequestStatus status)
-	        throws CategoryRequestNotFoundException, CategoryRequestDatabaseOperationException {
+			throws CategoryRequestNotFoundException, CategoryRequestDatabaseOperationException {
 
-	    try {
-	        categoryDAO.updateCategoryRequest(requestIds, approvedBy, status);
+		try {
+			categoryDAO.updateCategoryRequest(requestIds, approvedBy, status);
 
-	        if (status == RequestStatus.APPROVED) {
-	            List<String> allCategoryNames = new ArrayList<>();
+			if (status == RequestStatus.APPROVED) {
+				List<String> allCategoryNames = new ArrayList<>();
 
-	            for (Long requestId : requestIds) {
-	                CategoryRequestSearchCriteria criteria = new CategoryRequestSearchCriteria();
-	                criteria.setRequestId(requestId);
+				for (Long requestId : requestIds) {
+					CategoryRequestSearchCriteria criteria = new CategoryRequestSearchCriteria();
+					criteria.setRequestId(requestId);
 
-	                List<CategoryRequest> requests = categoryDAO.getRequest(criteria);
+					List<CategoryRequest> requests = categoryDAO.getRequest(criteria);
 
-	                if (requests == null || requests.isEmpty()) {
-	                    throw new CategoryRequestNotFoundException("No category request found for request ID: " + requestId);
-	                }
+					if (requests == null || requests.isEmpty()) {
+						throw new CategoryRequestNotFoundException(
+								"No category request found for request ID: " + requestId);
+					}
 
-	                for (CategoryRequest req : requests) {
-	                    if (req.getCategoryName() != null && !req.getCategoryName().isBlank()) {
-	                        allCategoryNames.add(req.getCategoryName().trim());
-	                    }
-	                }
-	            }
+					for (CategoryRequest req : requests) {
+						if (req.getCategoryName() != null && !req.getCategoryName().trim().isEmpty()) {
+							allCategoryNames.add(req.getCategoryName().trim());
+						}
+					}
+				}
 
-	            List<String> uniqueCategoryNames = allCategoryNames.stream()
-	                    .distinct()
-	                    .collect(Collectors.toList());
+				List<String> uniqueCategoryNames = allCategoryNames.stream().distinct().collect(Collectors.toList());
 
-	            if (!uniqueCategoryNames.isEmpty()) {
-	            	System.out.println("not empty list");
-	                for (String categoryName : uniqueCategoryNames) {
-	                	Category category = new Category();
-	                	category.setCategoryName(categoryName);
-	                	category.setCreatedAtDate(LocalDateTime.now());
-	                    categoryDAO.createCategory(category);
-	                }
-	            }
-	        }
+				if (!uniqueCategoryNames.isEmpty()) {
+					System.out.println("not empty list");
+					for (String categoryName : uniqueCategoryNames) {
+						Category category = new Category();
+						category.setCategoryName(categoryName);
+						category.setCreatedAtDate(LocalDateTime.now());
+						categoryDAO.createCategory(category);
+					}
+				}
+			}
 
-	    } catch (Exception e) {
-	        throw new CategoryRequestDatabaseOperationException("Failed to process category requests", e);
-	    }
+		} catch (Exception e) {
+			throw new CategoryRequestDatabaseOperationException("Failed to process category requests", e);
+		}
 	}
-
 
 	@Override
 	@Transactional
@@ -177,7 +175,7 @@ public class CategoryServiceImpl implements CategoryService {
 		try {
 			System.out.println("service called");
 			List<Category> result = categoryDAO.get(searchCriteria);
-			
+
 			System.out.println(result);
 
 			if (result == null || result.isEmpty()) {
