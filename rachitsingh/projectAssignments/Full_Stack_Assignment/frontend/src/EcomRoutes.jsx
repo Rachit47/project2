@@ -30,8 +30,8 @@ const EcomRoutes = () => {
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/orders" element={<OrdersPage />} />
-        <Route path="/product-approval" element={<ProductApprovalDashboard />} />
+        {/* <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/product-approval" element={<ProductApprovalDashboard />} /> */}
         {/* Protected Routes for all authenticated users */}
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Home />} />
@@ -78,9 +78,9 @@ const EcomRoutes = () => {
         <Route element={<ProtectedRoute allowedRoles={["ROLE_MANAGER"]} />}>
           <Route path="/product-approval" element={<ProductApprovalDashboard />} />
         </Route>
-         {/* <Route element={<ProtectedRoute allowedRoles={["ROLE_PRODUCT_EXE"]} />}>
+         <Route element={<ProtectedRoute allowedRoles={["ROLE_PRODUCT_EXE"]} />}>
           <Route path="/product-request" element={<ProductRequestDashboard />} />
-        </Route> */}
+        </Route>
       </Routes>
     </Suspense>
   );

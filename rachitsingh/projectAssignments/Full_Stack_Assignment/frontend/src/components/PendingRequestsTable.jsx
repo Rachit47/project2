@@ -4,6 +4,7 @@ import {
   approveRequests,
   rejectRequests,
 } from '../api/productApi';
+import { useAuth } from '../context/AuthContext';
 
 const PendingRequestsTable = () => {
   const [allRequests, setAllRequests] = useState([]);
@@ -11,7 +12,8 @@ const PendingRequestsTable = () => {
   const [selectedIds, setSelectedIds] = useState([]);
   const [message, setMessage] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const managerId = 4;
+  const {currentUser} = useAuth();
+  const managerId = currentUser.userId;
 
   const pageSize = 5;
   const observerRef = useRef();

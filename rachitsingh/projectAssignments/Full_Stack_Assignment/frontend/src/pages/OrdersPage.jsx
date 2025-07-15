@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import OrderTable from "../components/OrderTable";
 import OrderCard from "../components/OrderCard";
+ 
 import {
   fetchOrdersByCriteria,
   fetchOrderDetails,
   updateOrder,
 } from "../services/orders";
+import { useAuth } from "../context/AuthContext";
 
 const OrdersPage = () => {
   const statusLabels = {
@@ -25,7 +27,8 @@ const OrdersPage = () => {
   });
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const customerId = 5;
+  const {currentUser} = useAuth();
+  const customerId = currentUser.userId;
 
   const [pageNumber, setPageNumber] = useState(0);
   const [pageSize] = useState(10);
