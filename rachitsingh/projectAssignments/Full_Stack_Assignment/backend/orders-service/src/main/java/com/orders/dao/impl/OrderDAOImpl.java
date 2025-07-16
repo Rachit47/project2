@@ -119,7 +119,7 @@ public class OrderDAOImpl implements OrderDAO {
 		params.addValue("userId", orderObj.getUserId());
 		params.addValue("address", orderObj.getAddress());
 		params.addValue("totalAmount", orderObj.getTotalAmount());
-		params.addValue("status", orderObj.getStatus());
+		params.addValue("status", orderObj.getStatus().getCode());
 		params.addValue("placedAtDate", now);
 
 		GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();

@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.orders.carts.domain.CartItem;
-import com.orders.carts.service.CartService;
 import com.orders.carts.domain.AddItemRequest;
+import com.orders.carts.domain.CartItem;
+import com.orders.carts.domain.CheckoutRequest;
+import com.orders.carts.service.CartService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,8 +48,8 @@ public class CartController {
     }
     
     @PostMapping("/{userId}/checkout")
-    public String checkout(@PathVariable Long userId) {
-        cartService.checkout(userId);
+    public String checkout(@PathVariable Long userId, @RequestBody CheckoutRequest checkoutRequest) {
+        cartService.checkout(userId, checkoutRequest.getAddress());
         return "Order placed successfully.";
     }
 }

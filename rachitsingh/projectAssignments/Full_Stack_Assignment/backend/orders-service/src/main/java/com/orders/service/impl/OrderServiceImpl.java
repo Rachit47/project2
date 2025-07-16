@@ -18,7 +18,6 @@ import com.orders.enums.OrderStatus;
 import com.orders.exceptions.InvalidOrderException;
 import com.orders.exceptions.OrderDatabaseOperationException;
 import com.orders.exceptions.OrderNotFoundException;
-import com.orders.item.dao.OrderItemDAO;
 import com.orders.item.domain.OrderItem;
 import com.orders.item.service.OrderItemService;
 import com.orders.service.OrderService;
@@ -33,11 +32,10 @@ public class OrderServiceImpl implements OrderService {
 
 	private final OrderDAO orderDAO;
 	private final OrderItemService orderItemService;
-	private final OrderItemDAO orderItemDAO;
 	private final CartDAO cartDAO;
 	
 	@Override
-	public Order createOrderFromCartItems(Long userId,List<CartItem> cartItems) {
+	public Order createOrderFromCartItems(Long userId,List<CartItem> cartItems,String address) {
 	    List<OrderItem> orderItems = cartItems.stream()
 	            .map(cartItem -> {
 	                OrderItem orderItem = new OrderItem();
@@ -54,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
 
 	    Order newOrder = new Order();
 	    newOrder.setUserId(userId);
-//	    newOrder.setAddress(fetchUserAddress(userId));
+	    newOrder.setAddress(address);
 	    newOrder.setTotalAmount(totalAmount);
 	    newOrder.setStatus(OrderStatus.PROCESSING);
 	    newOrder.setPlacedAtDate(LocalDateTime.now());
@@ -65,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
 	        for (OrderItem item : orderItems) {
 	            item.setOrderId(savedOrder.getOrderId());
 	        }
-	        orderItemDAO.storeOrderItems(orderItems);
+	        orderItemService.saveOrderItems(orderItems);
 
 	        cartDAO.clearCart(userId);
 

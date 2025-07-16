@@ -61,9 +61,9 @@ public class OrderItemServiceImpl implements OrderItemService {
 			if (item.getProductId() == null || item.getProductId() <= 0) {
 				throw new InvalidOrderException("Each order item must have a valid Product ID.");
 			}
-			if (item.getProductName() == null || item.getProductName().trim().isEmpty()) {
-				throw new InvalidOrderException("Each order item must have a valid Product Name.");
-			}
+//			if (item.getProductName() == null || item.getProductName().trim().isEmpty()) {
+//				throw new InvalidOrderException("Each order item must have a valid Product Name.");
+//			}
 			if (item.getQuantity() <= 0) {
 				throw new InvalidOrderException("Quantity must be greater than zero.");
 			}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+// import { useAuth } from "../context/AuthContext";
 
 import {
   getCartItems,
@@ -14,6 +14,7 @@ const CartPage = () => {
   const [loading, setLoading] = useState(true);
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0); // For managing coupon discount
+  const [address, setAddress] = useState(""); // Add state for address
   const { currentUser } = useAuth();
   const customerId = currentUser.userId;
   const navigate = useNavigate();
@@ -67,7 +68,12 @@ const CartPage = () => {
 
   const handleCheckout = async () => {
     try {
-      await checkoutCart(customerId);
+      if (!address.trim()) {
+        alert("Please provide a shipping address.");
+        return;
+      }
+      const checkoutData = { address }; // Sending address along with userId
+      const response = await checkoutCart(customerId, checkoutData); // Pass address to API
       alert("Checkout successful! Redirecting to Orders page.");
       navigate("/orders");
     } catch (error) {
@@ -78,17 +84,13 @@ const CartPage = () => {
 
   // Calculate subtotal, tax, and grand total
   const calculateTotals = () => {
-    const subtotal = cartItems.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    );
+    const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
     const salesTax = subtotal * 0.1; // Assuming 10% tax rate
     const grandTotal = subtotal + salesTax - discount;
     return { subtotal, salesTax, grandTotal };
   };
 
   const handleApplyCoupon = () => {
-    // For simplicity, applying a fixed discount (you can replace it with an actual API call)
     if (couponCode === "DISCOUNT10") {
       setDiscount(50); // Example discount
     } else {
@@ -115,15 +117,9 @@ const CartPage = () => {
             >
               <div className="flex flex-col">
                 <p className="text-black font-semibold">{item.productName}</p>
-                <p className="text-black font-semibold">
-                  Price: ${item.price.toFixed(2)}
-                </p>
-                <p className="text-black font-semibold">
-                  Quantity: {item.quantity}
-                </p>
-                <p className="text-black font-semibold">
-                  Total: ${(item.price * item.quantity).toFixed(2)}
-                </p>
+                <p className="text-black font-semibold">Price: ${item.price.toFixed(2)}</p>
+                <p className="text-black font-semibold">Quantity: {item.quantity}</p>
+                <p className="text-black font-semibold">Total: ${(item.price * item.quantity).toFixed(2)}</p>
               </div>
               <button
                 className="bg-red-500 px-3 py-1 rounded"
@@ -144,19 +140,15 @@ const CartPage = () => {
               <p className="text-black font-semibold">${salesTax.toFixed(2)}</p>
             </div>
             <div className="flex justify-between mb-4">
-              <p className="text-black font-semibold">Discount:</p>
-              <p className="text-black font-semibold">
-                -${discount.toFixed(2)}
-              </p>
+              <p className="text-black font-semibold"><b>Discount:</b></p>
+              <p className="text-black font-semibold">-${discount.toFixed(2)}</p>
             </div>
             <div className="flex justify-between mb-4 font-semibold">
-              <p className="text-black font-semibold">Grand Total:</p>
-              <p className="text-black font-semibold">
-                ${grandTotal.toFixed(2)}
-              </p>
+              <p className="text-black font-semibold"><b>Grand Total:</b></p>
+              <p className="text-black font-semibold">${grandTotal.toFixed(2)}</p>
             </div>
 
-            <div className="flex space-x-4">
+            {/* <div className="flex space-x-4">
               <input
                 type="text"
                 placeholder="Enter coupon code"
@@ -170,7 +162,18 @@ const CartPage = () => {
               >
                 Apply Coupon
               </button>
-            </div>
+            </div> */}
+          </div>
+
+          {/* Address input */}
+          <div className="mt-4">
+            <input
+              type="text"
+              className="p-2 rounded w-full"
+              placeholder="Enter shipping address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            />
           </div>
 
           <div className="mt-4 space-x-4">
@@ -194,3 +197,4 @@ const CartPage = () => {
 };
 
 export default CartPage;
+

@@ -20,5 +20,5 @@ public interface OrderService {
 	Order getOrderDetails(Long orderId, Long customerId)
 			throws OrderDatabaseOperationException, InvalidOrderException, OrderNotFoundException;
 
-	Order createOrderFromCartItems(Long userId, List<CartItem> cartItems);
+	Order createOrderFromCartItems(Long userId, List<CartItem> cartItems, String address);
 }

@@ -62,13 +62,13 @@ public class CartServiceImpl implements CartService {
     }
     
     @Override
-    public void checkout(Long userId) {
+    public void checkout(Long userId,String address) {
         List<CartItem> items = getCartItems(userId);
         if (items.isEmpty()) {
             throw new IllegalStateException("Cart is empty.");
         }
 
-        orderService.createOrderFromCartItems(userId, items);
+        orderService.createOrderFromCartItems(userId, items,address);
 
         clearCart(userId);
     }
