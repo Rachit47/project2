@@ -67,20 +67,27 @@ const CartPage = () => {
   };
 
   const handleCheckout = async () => {
-    try {
-      if (!address.trim()) {
-        alert("Please provide a shipping address.");
-        return;
-      }
-      const checkoutData = { address }; // Sending address along with userId
-      const response = await checkoutCart(customerId, checkoutData); // Pass address to API
-      alert("Checkout successful! Redirecting to Orders page.");
-      navigate("/orders");
-    } catch (error) {
-      console.error("Checkout failed", error);
-      alert("Checkout failed.");
+  try {
+    if (!address.trim()) {
+      alert("Please provide a shipping address.");
+      return;
     }
-  };
+    const checkoutData = { address }; // Sending address along with userId
+    const response = await checkoutCart(customerId, checkoutData); // Capture response from API
+
+    // Assuming the response contains data like orderId or a status message
+    if (response.data && response.data.orderId) {
+      alert(`Checkout successful! Your order ID is ${response.data.orderId}. Redirecting to Orders page.`);
+    } else {
+      alert("Checkout successful! Redirecting to Orders page.");
+    }
+
+    navigate("/orders"); // Navigate to the orders page
+  } catch (error) {
+    console.error("Checkout failed", error);
+    alert("Checkout failed.");
+  }
+};
 
   // Calculate subtotal, tax, and grand total
   const calculateTotals = () => {
