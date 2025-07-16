@@ -30,7 +30,7 @@ public class CartController {
 
     @PostMapping("/add")
     public String addItem(@RequestBody AddItemRequest request) {
-        cartService.addItemToCart(request.getUserId(), request.getProductId(), request.getQuantity(), request.getPrice());
+        cartService.addItemToCart(request.getUserId(), request.getProductId(), request.getQuantity(), request.getPrice(), request.getProductName());
         return "Item added to cart.";
     }
 

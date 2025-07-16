@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 import {
   getCartItems,
@@ -7,12 +8,13 @@ import {
   clearCart,
   checkoutCart,
 } from "../services/CartService";
-import { useAuth } from "../context/AuthContext";
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const {currentUser} = useAuthAuth();
+  const [couponCode, setCouponCode] = useState("");
+  const [discount, setDiscount] = useState(0); // For managing coupon discount
+  const { currentUser } = useAuth();
   const customerId = currentUser.userId;
   const navigate = useNavigate();
 
@@ -21,29 +23,27 @@ const CartPage = () => {
   }, []);
 
   const loadCart = async () => {
-  try {
-    setLoading(true);
-    const res = await getCartItems(customerId);
+    try {
+      setLoading(true);
+      const res = await getCartItems(customerId);
 
-    console.log("Cart response:", res.data);
+      console.log("Cart response:", res.data);
 
-    let items = [];
-    if (Array.isArray(res.data)) {
-      items = res.data;
-    } else if (res.data && Array.isArray(res.data.items)) {
-      items = res.data.items;
+      let items = [];
+      if (Array.isArray(res.data)) {
+        items = res.data;
+      } else if (res.data && Array.isArray(res.data.items)) {
+        items = res.data.items;
+      }
+
+      setCartItems(items);
+    } catch (error) {
+      console.error("Failed to load cart", error);
+      alert("Failed to load cart.");
+    } finally {
+      setLoading(false);
     }
-
-    setCartItems(items);
-
-  } catch (error) {
-    console.error("Failed to load cart", error);
-    alert("Failed to load cart.");
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   const handleRemoveItem = async (cartItemId) => {
     try {
@@ -76,6 +76,25 @@ const CartPage = () => {
     }
   };
 
+  // Calculate subtotal, tax, and grand total
+  const calculateTotals = () => {
+    const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+    const salesTax = subtotal * 0.1; // Assuming 10% tax rate
+    const grandTotal = subtotal + salesTax - discount;
+    return { subtotal, salesTax, grandTotal };
+  };
+
+  const handleApplyCoupon = () => {
+    // For simplicity, applying a fixed discount (you can replace it with an actual API call)
+    if (couponCode === "DISCOUNT10") {
+      setDiscount(50); // Example discount
+    } else {
+      alert("Invalid coupon code.");
+    }
+  };
+
+  const { subtotal, salesTax, grandTotal } = calculateTotals();
+
   return (
     <div className="p-6 text-white">
       <h1 className="text-2xl font-semibold mb-4">My Cart</h1>
@@ -89,11 +108,13 @@ const CartPage = () => {
           {cartItems.map((item) => (
             <div
               key={item.cartItemId}
-              className="flex justify-between items-center border p-2 rounded"
+              className="flex justify-between items-center border p-4 rounded"
             >
-              <div>
-                <p>Product ID: {item.productId}</p>
+              <div className="flex flex-col">
+                <p className="text-black font-semibold">{item.productName}</p>
+                <p>Price: ${item.price.toFixed(2)}</p>
                 <p>Quantity: {item.quantity}</p>
+                <p>Total: ${(item.price * item.quantity).toFixed(2)}</p>
               </div>
               <button
                 className="bg-red-500 px-3 py-1 rounded"
@@ -103,6 +124,41 @@ const CartPage = () => {
               </button>
             </div>
           ))}
+
+          <div className="mt-4">
+            <div className="flex justify-between mb-2">
+              <p>Subtotal:</p>
+              <p>${subtotal.toFixed(2)}</p>
+            </div>
+            <div className="flex justify-between mb-2">
+              <p>Sales Tax (10%):</p>
+              <p>${salesTax.toFixed(2)}</p>
+            </div>
+            <div className="flex justify-between mb-4">
+              <p>Discount:</p>
+              <p>-${discount.toFixed(2)}</p>
+            </div>
+            <div className="flex justify-between mb-4 font-semibold">
+              <p>Grand Total:</p>
+              <p>${grandTotal.toFixed(2)}</p>
+            </div>
+
+            <div className="flex space-x-4">
+              <input
+                type="text"
+                placeholder="Enter coupon code"
+                className="p-2 rounded w-full"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+              />
+              <button
+                className="bg-blue-500 px-4 py-2 rounded"
+                onClick={handleApplyCoupon}
+              >
+                Apply Coupon
+              </button>
+            </div>
+          </div>
 
           <div className="mt-4 space-x-4">
             <button

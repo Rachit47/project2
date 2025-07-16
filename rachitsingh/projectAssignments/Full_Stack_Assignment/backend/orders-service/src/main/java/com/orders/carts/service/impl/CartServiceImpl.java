@@ -32,7 +32,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void addItemToCart(Long userId, Long productId, Integer quantity,BigDecimal price) {
+    public void addItemToCart(Long userId, Long productId, Integer quantity,BigDecimal price,String productName) {
         Cart cart = getOrCreateCart(userId);
         CartItem item = new CartItem();
         item.setCartId(cart.getCartId());
@@ -40,6 +40,7 @@ public class CartServiceImpl implements CartService {
         item.setUserId(userId);
         item.setQuantity(quantity);
         item.setPrice(price);
+        item.setProductName(productName);
         cartDAO.addItemToCart(item);
     }
 

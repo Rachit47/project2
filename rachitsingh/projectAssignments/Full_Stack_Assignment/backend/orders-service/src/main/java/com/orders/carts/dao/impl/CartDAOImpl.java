@@ -34,6 +34,7 @@ public class CartDAOImpl implements CartDAO {
         item.setProductId(rs.getLong("ProductId"));
         item.setQuantity(rs.getInt("Quantity"));
         item.setPrice(rs.getBigDecimal("Price"));
+        item.setProductName("ProductName");
         item.setAddededAt(rs.getTimestamp("AddedAtDate") != null ? rs.getTimestamp("AddedAtDate").toLocalDateTime() : null);
         return item;
     };
@@ -51,15 +52,16 @@ public class CartDAOImpl implements CartDAO {
 
     @Override
     public void addItemToCart(CartItem item) {
-        String sql = "INSERT INTO cart_items (CartId, ProductId, UserId, Quantity, Price) " +
-                     "VALUES (:cartId, :productId, :userId, :quantity, :price)";
+        String sql = "INSERT INTO cart_items (CartId, ProductId, UserId, Quantity, Price, ProductName) " +
+                     "VALUES (:cartId, :productId, :userId, :quantity, :price, :productName)";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("cartId", item.getCartId())
                 .addValue("productId", item.getProductId())
                 .addValue("userId", item.getUserId())
                 .addValue("quantity", item.getQuantity())
-                .addValue("price", item.getPrice());
+                .addValue("price", item.getPrice())
+        		.addValue("productName",item.getProductName());
         jdbcTemplate.update(sql, params);
     }
 
