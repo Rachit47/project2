@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 import {
   getCartItems,
@@ -12,7 +12,6 @@ import {
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0); // For managing coupon discount
   const [address, setAddress] = useState(""); // Add state for address
   const { currentUser } = useAuth();
@@ -97,13 +96,13 @@ const CartPage = () => {
     return { subtotal, salesTax, grandTotal };
   };
 
-  const handleApplyCoupon = () => {
-    if (couponCode === "DISCOUNT10") {
-      setDiscount(50); // Example discount
-    } else {
-      alert("Invalid coupon code.");
-    }
-  };
+  // const handleApplyCoupon = () => {
+  //   if (couponCode === "DISCOUNT10") {
+  //     setDiscount(50); // Example discount
+  //   } else {
+  //     alert("Invalid coupon code.");
+  //   }
+  // };
 
   const { subtotal, salesTax, grandTotal } = calculateTotals();
 

@@ -30,6 +30,6 @@ export const clearCart = (userId) => {
   return axios.delete(`${BASE_URL}/${userId}/clear`);
 };
 
-export const checkoutCart = (userId) => {
-  return axios.post(`${BASE_URL}/${userId}/checkout`);
+export const checkoutCart = (userId, { address }) => {
+  return axios.post(`${BASE_URL}/${userId}/checkout`, { address });
 };
