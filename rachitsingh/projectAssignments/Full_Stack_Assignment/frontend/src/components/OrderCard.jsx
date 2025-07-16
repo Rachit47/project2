@@ -47,7 +47,11 @@ const OrderCard = ({ order, onUpdateAddress, onClose }) => {
         <div className="col-md-6">
           <p className="mb-2">
             <strong>Status:</strong>{" "}
-            <span className={`text-uppercase fw-medium ${statusClass[order.status]}`}>
+            <span
+              className={`text-uppercase fw-medium ${
+                statusClass[order.status]
+              }`}
+            >
               {statusLabels[order.status] || order.status}
             </span>
           </p>
@@ -60,18 +64,25 @@ const OrderCard = ({ order, onUpdateAddress, onClose }) => {
           </p>
         </div>
 
-        <div className="col-md-6">
-          <label className="form-label text-muted small">Update Address</label>
-          <textarea
-            className="form-control bg-secondary text-light border-dark"
-            rows={3}
-            value={newAddress}
-            onChange={(e) => setNewAddress(e.target.value)}
-          />
-          <button onClick={handleUpdate} className="btn btn-success btn-sm mt-3">
-            Save Address
-          </button>
-        </div>
+        {order.status === "Processing" && (
+          <div className="col-md-6">
+            <label className="form-label text-muted small">
+              Update Address
+            </label>
+            <textarea
+              className="form-control bg-secondary text-light border-dark"
+              rows={3}
+              value={newAddress}
+              onChange={(e) => setNewAddress(e.target.value)}
+            />
+            <button
+              onClick={handleUpdate}
+              className="btn btn-success btn-sm mt-3"
+            >
+              Save Address
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="mt-5">
@@ -89,7 +100,9 @@ const OrderCard = ({ order, onUpdateAddress, onClose }) => {
                   </div>
                   <div className="text-end">
                     <p className="mb-1">₹{item.price}</p>
-                    <p className="text-light small mb-0">ID: {item.productId}</p>
+                    <p className="text-light small mb-0">
+                      ID: {item.productId}
+                    </p>
                   </div>
                 </div>
               </div>

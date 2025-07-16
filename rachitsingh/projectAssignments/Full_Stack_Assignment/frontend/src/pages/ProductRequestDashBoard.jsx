@@ -4,8 +4,10 @@ import {
   searchProductRequests,
 } from "../services/ProductRequestService";
 import { Dropdown, Form } from "react-bootstrap";
+import { useAuth } from "../context/AuthContext";
 
 const ProductRequestDashboard = () => {
+  const { currentUser } = useAuth();
   const [pageNumber, setPageNumber] = useState(0);
   const [pageSize, setPageSize] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
@@ -23,7 +25,6 @@ const ProductRequestDashboard = () => {
     description: "",
     price: "",
     quantity: "",
-    requestedBy: "",
   });
 
   const statusOptions = ["PENDING", "APPROVED", "DECLINED"];
@@ -83,7 +84,7 @@ const ProductRequestDashboard = () => {
         ...requestForm,
         price: parseFloat(requestForm.price),
         quantity: parseInt(requestForm.quantity, 10),
-        requestedBy: parseInt(requestForm.requestedBy, 10),
+        requestedBy: currentUser.userId,
       };
       await createProductRequest(payload);
       alert("Product request submitted successfully!");
@@ -92,7 +93,6 @@ const ProductRequestDashboard = () => {
         description: "",
         price: "",
         quantity: "",
-        requestedBy: "",
       });
       setPageNumber(0);
       fetchFilteredData();
@@ -226,7 +226,7 @@ const ProductRequestDashboard = () => {
                 setFilters({ ...filters, status: e.target.value })
               }
             >
-              <option value="">Select Status</option>
+              <option value="">All</option>
               {statusOptions.map((status) => (
                 <option key={status} value={status}>
                   {status}
@@ -349,72 +349,66 @@ const ProductRequestDashboard = () => {
       </div>
 
       {/* Create Form */}
-      <div className="mt-5 bg-dark text-light p-4 rounded border">
-        <h4 className="mb-3 fw-semibold">Create New Product Request</h4>
-        <form onSubmit={handleSubmitRequest} className="row g-3">
-          <div className="col-md-6">
-            <input
-              type="text"
-              name="productName"
-              placeholder="Product Name"
-              className="form-control"
-              value={requestForm.productName}
-              onChange={handleFormChange}
-              required
-            />
-          </div>
-          <div className="col-md-6">
-            <input
-              type="number"
-              name="quantity"
-              placeholder="Quantity"
-              className="form-control"
-              value={requestForm.quantity}
-              onChange={handleFormChange}
-              required
-            />
-          </div>
-          <div className="col-12">
-            <textarea
-              name="description"
-              placeholder="Description"
-              className="form-control"
-              rows={3}
-              value={requestForm.description}
-              onChange={handleFormChange}
-              required
-            ></textarea>
-          </div>
-          <div className="col-md-6">
-            <input
-              type="number"
-              step="0.01"
-              name="price"
-              placeholder="Price"
-              className="form-control"
-              value={requestForm.price}
-              onChange={handleFormChange}
-              required
-            />
-          </div>
-          <div className="col-md-6">
-            <input
-              type="number"
-              name="requestedBy"
-              placeholder="Requested By (User ID)"
-              className="form-control"
-              value={requestForm.requestedBy}
-              onChange={handleFormChange}
-              required
-            />
-          </div>
-          <div className="col-12 text-end">
-            <button type="submit" className="btn btn-success btn-sm">
-              Submit Request
-            </button>
-          </div>
-        </form>
-      </div>
+      <form onSubmit={handleSubmitRequest} className="row g-3">
+        <div className="col-md-6">
+          <input
+            type="text"
+            name="productName"
+            placeholder="Product Name"
+            className="form-control"
+            value={requestForm.productName}
+            onChange={handleFormChange}
+            required
+            minLength={2}
+            maxLength={100}
+          />
+        </div>
+        <div className="col-md-6">
+          <input
+            type="number"
+            name="quantity"
+            placeholder="Quantity"
+            className="form-control"
+            value={requestForm.quantity}
+            onChange={handleFormChange}
+            required
+            min={1}
+            max={10000}
+          />
+        </div>
+        <div className="col-12">
+          <textarea
+            name="description"
+            placeholder="Description"
+            className="form-control"
+            rows={3}
+            value={requestForm.description}
+            onChange={handleFormChange}
+            required
+            minLength={10}
+            maxLength={500}
+          ></textarea>
+        </div>
+        <div className="col-md-6">
+          <input
+            type="number"
+            step="0.00"
+            name="price"
+            placeholder="Price"
+            className="form-control"
+            value={requestForm.price}
+            onChange={handleFormChange}
+            required
+            min={0.01}
+            max={100000}
+          />
+        </div>
+        <div className="col-12 text-end">
+          <button type="submit" className="btn btn-success btn-sm">
+            Submit Request
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

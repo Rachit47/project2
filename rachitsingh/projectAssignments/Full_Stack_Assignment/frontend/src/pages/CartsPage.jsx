@@ -12,8 +12,8 @@ import {
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [discount, setDiscount] = useState(0); // For managing coupon discount
-  const [address, setAddress] = useState(""); // Add state for address
+  const discount = 0.0;
+  const [address, setAddress] = useState("");
   const { currentUser } = useAuth();
   const customerId = currentUser.userId;
   const navigate = useNavigate();
@@ -26,8 +26,6 @@ const CartPage = () => {
     try {
       setLoading(true);
       const res = await getCartItems(customerId);
-
-      console.log("Cart response:", res.data);
 
       let items = [];
       if (Array.isArray(res.data)) {
@@ -66,133 +64,126 @@ const CartPage = () => {
   };
 
   const handleCheckout = async () => {
-  try {
-    if (!address.trim()) {
-      alert("Please provide a shipping address.");
-      return;
+    try {
+      if (!address.trim()) {
+        alert("Please provide a shipping address.");
+        return;
+      }
+      const checkoutData = { address };
+      const response = await checkoutCart(customerId, checkoutData);
+
+      if (response.data && response.data.orderId) {
+        alert(
+          `Checkout successful! Your order ID is ${response.data.orderId}. Redirecting to Orders page.`
+        );
+      } else {
+        alert("Checkout successful! Redirecting to Orders page.");
+      }
+
+      navigate("/orders");
+    } catch (error) {
+      console.error("Checkout failed", error);
+      alert("Checkout failed.");
     }
-    const checkoutData = { address }; // Sending address along with userId
-    const response = await checkoutCart(customerId, checkoutData); // Capture response from API
+  };
 
-    // Assuming the response contains data like orderId or a status message
-    if (response.data && response.data.orderId) {
-      alert(`Checkout successful! Your order ID is ${response.data.orderId}. Redirecting to Orders page.`);
-    } else {
-      alert("Checkout successful! Redirecting to Orders page.");
-    }
-
-    navigate("/orders"); // Navigate to the orders page
-  } catch (error) {
-    console.error("Checkout failed", error);
-    alert("Checkout failed.");
-  }
-};
-
-  // Calculate subtotal, tax, and grand total
   const calculateTotals = () => {
-    const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-    const salesTax = subtotal * 0.1; // Assuming 10% tax rate
+    const subtotal = cartItems.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
+    const salesTax = subtotal * 0.1;
     const grandTotal = subtotal + salesTax - discount;
     return { subtotal, salesTax, grandTotal };
   };
 
-  // const handleApplyCoupon = () => {
-  //   if (couponCode === "DISCOUNT10") {
-  //     setDiscount(50); // Example discount
-  //   } else {
-  //     alert("Invalid coupon code.");
-  //   }
-  // };
-
   const { subtotal, salesTax, grandTotal } = calculateTotals();
 
   return (
-    <div className="p-6 text-white">
-      <h1 className="text-2xl font-semibold mb-4 text-black">My Cart</h1>
+    <div className="container my-5 text-light bg-dark p-4 rounded shadow">
+      <h1 className="mb-4">My Cart</h1>
 
       {loading ? (
         <p>Loading...</p>
       ) : cartItems.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (
-        <div className="space-y-4">
+        <div className="row gy-4">
           {cartItems.map((item) => (
-            <div
-              key={item.cartItemId}
-              className="flex justify-between items-center border p-4 rounded"
-            >
-              <div className="flex flex-col">
-                <p className="text-black font-semibold">{item.productName}</p>
-                <p className="text-black font-semibold">Price: ${item.price.toFixed(2)}</p>
-                <p className="text-black font-semibold">Quantity: {item.quantity}</p>
-                <p className="text-black font-semibold">Total: ${(item.price * item.quantity).toFixed(2)}</p>
+            <div key={item.cartItemId} className="col-md-6">
+              <div className="card bg-secondary text-white">
+                <div className="card-body">
+                  <h5 className="card-title">{item.productName}</h5>
+                  <p className="card-text mb-1">
+                    <strong>Price:</strong> ₹{item.price.toFixed(2)}
+                  </p>
+                  <p className="card-text mb-1">
+                    <strong>Quantity:</strong> {item.quantity}
+                  </p>
+                  <p className="card-text">
+                    <strong>Total:</strong> ₹
+                    {(item.price * item.quantity).toFixed(2)}
+                  </p>
+                  <button
+                    className="btn btn-danger btn-sm mt-2"
+                    onClick={() => handleRemoveItem(item.cartItemId)}
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
-              <button
-                className="bg-red-500 px-3 py-1 rounded"
-                onClick={() => handleRemoveItem(item.cartItemId)}
-              >
-                Remove
-              </button>
             </div>
           ))}
 
-          <div className="mt-4">
-            <div className="flex justify-between mb-2">
-              <p className="text-black font-semibold">Subtotal:</p>
-              <p className="text-black font-semibold">${subtotal.toFixed(2)}</p>
+          {/* Totals */}
+          <div className="col-12 mt-4">
+            <div className="card bg-dark border-light text-white">
+              <div className="card-body">
+                <div className="d-flex justify-content-between mb-2">
+                  <span>Subtotal:</span>
+                  <span>₹{subtotal.toFixed(2)}</span>
+                </div>
+                <div className="d-flex justify-content-between mb-2">
+                  <span>Sales Tax (10%):</span>
+                  <span>₹{salesTax.toFixed(2)}</span>
+                </div>
+                <div className="d-flex justify-content-between mb-2">
+                  <span>Discount:</span>
+                  <span>-₹{discount.toFixed(2)}</span>
+                </div>
+                <hr className="border-light" />
+                <div className="d-flex justify-content-between fs-5 fw-bold">
+                  <span>Grand Total:</span>
+                  <span>₹{grandTotal.toFixed(2)}</span>
+                </div>
+              </div>
             </div>
-            <div className="flex justify-between mb-2">
-              <p className="text-black font-semibold">Sales Tax (10%):</p>
-              <p className="text-black font-semibold">${salesTax.toFixed(2)}</p>
-            </div>
-            <div className="flex justify-between mb-4">
-              <p className="text-black font-semibold"><b>Discount:</b></p>
-              <p className="text-black font-semibold">-${discount.toFixed(2)}</p>
-            </div>
-            <div className="flex justify-between mb-4 font-semibold">
-              <p className="text-black font-semibold"><b>Grand Total:</b></p>
-              <p className="text-black font-semibold">${grandTotal.toFixed(2)}</p>
-            </div>
-
-            {/* <div className="flex space-x-4">
-              <input
-                type="text"
-                placeholder="Enter coupon code"
-                className="p-2 rounded w-full"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)}
-              />
-              <button
-                className="bg-blue-500 px-4 py-2 rounded"
-                onClick={handleApplyCoupon}
-              >
-                Apply Coupon
-              </button>
-            </div> */}
           </div>
 
-          {/* Address input */}
-          <div className="mt-4">
+          {/* Address Input */}
+          <div className="col-12 mt-4">
+            <label htmlFor="addressInput" className="form-label">
+              Shipping Address
+            </label>
             <input
+              id="addressInput"
               type="text"
-              className="p-2 rounded w-full"
+              className="form-control bg-dark text-white border-secondary"
               placeholder="Enter shipping address"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             />
           </div>
 
-          <div className="mt-4 space-x-4">
+          {/* Action Buttons */}
+          <div className="col-12 mt-4 d-flex gap-3">
             <button
-              className="bg-yellow-500 px-4 py-2 rounded"
+              className="btn btn-outline-warning"
               onClick={handleClearCart}
             >
               Clear Cart
             </button>
-            <button
-              className="bg-green-500 px-4 py-2 rounded"
-              onClick={handleCheckout}
-            >
+            <button className="btn btn-success" onClick={handleCheckout}>
               Checkout
             </button>
           </div>
@@ -203,4 +194,3 @@ const CartPage = () => {
 };
 
 export default CartPage;
-
