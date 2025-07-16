@@ -6,18 +6,17 @@ import {
 
 const ProductRequestDashboard = () => {
   const [pageNumber, setPageNumber] = useState(0);
-  const [pageSize, setPageSize] = useState(10); // Or 5, 20 based on preference
-  const [totalFetched, setTotalFetched] = useState(0);
+  const [pageSize, setPageSize] = useState(5);
+  const [totalCount, setTotalCount] = useState(0);
   const [productRequests, setProductRequests] = useState([]);
   const [allRequestIds, setAllRequestIds] = useState([]);
   const [allProductNames, setAllProductNames] = useState([]);
   const [filters, setFilters] = useState({
     requestIds: [],
     productNames: [],
-    status: "",
-    requestedBy: "",
+    status: [],
+    requestedBy: [],
   });
-
   const [requestForm, setRequestForm] = useState({
     productName: "",
     description: "",
@@ -29,36 +28,10 @@ const ProductRequestDashboard = () => {
   const statusOptions = ["PENDING", "APPROVED", "DECLINED"];
 
   useEffect(() => {
-    applyFilters();
+    fetchFilteredData();
   }, [pageNumber, pageSize]);
 
-  const loadRequests = async () => {
-    try {
-      const res = await searchProductRequests({
-        pageNumber,
-        pageSize,
-      });
-
-      if (Array.isArray(res.data)) {
-        setProductRequests(res.data);
-        setTotalFetched(res.data.length);
-        setAllRequestIds([...new Set(res.data.map((r) => r.productRequestId))]);
-        setAllProductNames([...new Set(res.data.map((r) => r.productName))]);
-      }
-    } catch (err) {
-      if (err.response?.status === 404) {
-        setProductRequests([]);
-        setTotalFetched(0);
-      } else {
-        alert(
-          "Failed to load product requests: " +
-            (err.response?.data?.message || err.message)
-        );
-      }
-    }
-  };
-
-  const applyFilters = async () => {
+  const fetchFilteredData = async () => {
     try {
       const payload = {
         pageNumber,
@@ -67,43 +40,38 @@ const ProductRequestDashboard = () => {
           filters.requestIds.length > 0 ? filters.requestIds.map(Number) : null,
         productNames:
           filters.productNames.length > 0 ? filters.productNames : null,
-        status: filters.status || null,
-        loggedInUserId: filters.requestedBy
-          ? Number(filters.requestedBy)
-          : null,
+        status: filters.status.length > 0 ? filters.status : null,
+        requestedBy:
+          filters.requestedBy.length > 0
+            ? filters.requestedBy.map(Number)
+            : null,
       };
 
       const res = await searchProductRequests(payload);
-      if (Array.isArray(res.data) && res.data.length > 0) {
-        setProductRequests(res.data);
-        setTotalFetched(res.data.length);
-      } else {
-        setProductRequests([]);
-        setTotalFetched(0);
+      const data = res.data.records || res.data;
+      const count = res.data.totalCount ?? data.length;
+
+      setProductRequests(data);
+      setTotalCount(count);
+
+      setAllRequestIds([...new Set(data.map((r) => r.productRequestId))]);
+      setAllProductNames([...new Set(data.map((r) => r.productName))]);
+
+      if (data.length === 0) {
         alert("No product requests found for the given filter criteria.");
       }
     } catch (err) {
       if (err.response?.status === 404) {
         setProductRequests([]);
-        setTotalFetched(0);
+        setTotalCount(0);
         alert("No product requests found for the given filter criteria.");
       } else {
         alert(
-          "Something went wrong while filtering: " +
+          "Something went wrong while fetching data: " +
             (err.response?.data?.message || err.message)
         );
       }
     }
-  };
-
-  const resetFilters = () => {
-    setFilters({
-      requestIds: [],
-      productNames: [],
-      status: "",
-      requestedBy: "",
-    });
-    loadRequests();
   };
 
   const handleFormChange = (e) => {
@@ -128,7 +96,8 @@ const ProductRequestDashboard = () => {
         quantity: "",
         requestedBy: "",
       });
-      loadRequests();
+      setPageNumber(0);
+      fetchFilteredData();
     } catch (err) {
       alert(
         "Submission failed: " + (err.response?.data?.message || err.message)
@@ -136,12 +105,40 @@ const ProductRequestDashboard = () => {
     }
   };
 
+  const resetFilters = () => {
+    setFilters({
+      requestIds: [],
+      productNames: [],
+      status: [],
+      requestedBy: [],
+    });
+    setPageNumber(0);
+    fetchFilteredData();
+  };
+
+  const handleApplyFilters = () => {
+    setPageNumber(0);
+    fetchFilteredData();
+  };
+
+  // Calculate total pages, ensure at least 1 page if there are records
+  const totalPages = totalCount > 0 ? Math.ceil(totalCount / pageSize) : 1;
+  // Ensure pageNumber is always valid
+  useEffect(() => {
+    if (pageNumber >= totalPages) {
+      setPageNumber(totalPages - 1);
+    }
+    // eslint-disable-next-line
+  }, [totalPages]);
   return (
     <div className="container-fluid bg-dark text-light min-vh-100 py-4 px-3">
       {/* Header */}
       <div className="border-bottom border-secondary pb-3 mb-4 d-flex justify-content-between">
         <h2 className="h4 fw-bold">Product Dashboard</h2>
-        <button className="btn btn-outline-light btn-sm" onClick={loadRequests}>
+        <button
+          className="btn btn-outline-light btn-sm"
+          onClick={fetchFilteredData}
+        >
           Refresh
         </button>
       </div>
@@ -165,6 +162,7 @@ const ProductRequestDashboard = () => {
                   ),
                 })
               }
+              size={Math.min(5, allRequestIds.length) || 2}
             >
               {allRequestIds.map((id) => (
                 <option key={id} value={id}>
@@ -173,7 +171,6 @@ const ProductRequestDashboard = () => {
               ))}
             </select>
           </div>
-
           <div className="col-md-3">
             <label className="form-label">Product Names</label>
             <select
@@ -189,6 +186,7 @@ const ProductRequestDashboard = () => {
                   ),
                 })
               }
+              size={Math.min(5, allProductNames.length) || 2}
             >
               {allProductNames.map((name, idx) => (
                 <option key={idx} value={name}>
@@ -197,17 +195,22 @@ const ProductRequestDashboard = () => {
               ))}
             </select>
           </div>
-
           <div className="col-md-2">
             <label className="form-label">Status</label>
             <select
               className="form-select"
+              multiple
               value={filters.status}
               onChange={(e) =>
-                setFilters({ ...filters, status: e.target.value })
+                setFilters({
+                  ...filters,
+                  status: Array.from(
+                    e.target.selectedOptions,
+                    (opt) => opt.value
+                  ),
+                })
               }
             >
-              <option value="">All</option>
               {statusOptions.map((status) => (
                 <option key={status} value={status}>
                   {status}
@@ -215,23 +218,28 @@ const ProductRequestDashboard = () => {
               ))}
             </select>
           </div>
-
           <div className="col-md-2">
             <label className="form-label">Requested By</label>
             <input
-              type="number"
+              type="text"
               className="form-control"
-              value={filters.requestedBy}
+              placeholder="Comma-separated IDs"
+              value={filters.requestedBy.join(",")}
               onChange={(e) =>
-                setFilters({ ...filters, requestedBy: e.target.value })
+                setFilters({
+                  ...filters,
+                  requestedBy: e.target.value
+                    .split(",")
+                    .map((id) => id.trim())
+                    .filter((id) => id),
+                })
               }
             />
           </div>
-
           <div className="col-md-2 d-flex gap-2">
             <button
               className="btn btn-primary btn-sm mt-3"
-              onClick={applyFilters}
+              onClick={handleApplyFilters}
             >
               Apply
             </button>
@@ -252,7 +260,7 @@ const ProductRequestDashboard = () => {
             <tr>
               <th>ID</th>
               <th>Name</th>
-              <th>Quantity</th>
+              <th>Qty</th>
               <th>Price</th>
               <th>Status</th>
               <th>Requested By</th>
@@ -295,57 +303,50 @@ const ProductRequestDashboard = () => {
             )}
           </tbody>
         </table>
-        {/* Pagination Controls */}
-        <div className="d-flex justify-content-between align-items-center mt-3">
+
+        {/* Pagination */}
+        <div className="d-flex justify-content-between align-items-center mt-3 px-2">
           <div>
-            Showing page <strong>{pageNumber + 1}</strong> — Fetched:{" "}
-            <strong>{totalFetched}</strong> records
+            Page <strong>{pageNumber + 1}</strong> of{" "}
+            <strong>{totalPages}</strong>
           </div>
           <div className="d-flex gap-2">
             <button
               className="btn btn-sm btn-outline-light"
-              onClick={() => {
-                if (pageNumber > 0) {
-                  setPageNumber(pageNumber - 1);
-                }
-              }}
-              disabled={pageNumber === 0}
+              onClick={() => setPageNumber((prev) => prev - 1)}
+              disabled={pageNumber <= 0}
             >
-              ← Previous
+              ← Prev
             </button>
             <button
               className="btn btn-sm btn-outline-light"
-              onClick={() => {
-                if (totalFetched === pageSize) {
-                  setPageNumber(pageNumber + 1);
-                }
-              }}
-              disabled={totalFetched < pageSize}
+              onClick={() => setPageNumber((prev) => prev + 1)}
+              disabled={pageNumber >= totalPages - 1}
             >
               Next →
             </button>
           </div>
-        </div>
-        <div className="d-flex align-items-center gap-2">
-          <label className="form-label m-0">Rows per page:</label>
-          <select
-            className="form-select form-select-sm w-auto"
-            value={pageSize}
-            onChange={(e) => {
-              setPageSize(Number(e.target.value));
-              setPageNumber(0);
-            }}
-          >
-            {[5, 10, 20, 50].map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
+          <div className="d-flex align-items-center gap-2">
+            <label className="form-label m-0">Rows per page:</label>
+            <select
+              className="form-select form-select-sm w-auto"
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setPageNumber(0);
+              }}
+            >
+              {[5, 10, 20].map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* Create Request Form */}
+      {/* Create Form */}
       <div className="mt-5 bg-dark text-light p-4 rounded border">
         <h4 className="mb-3 fw-semibold">Create New Product Request</h4>
         <form onSubmit={handleSubmitRequest} className="row g-3">
