@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Overlay, Popover } from "react-bootstrap";
+import { Overlay, Popover, Form, InputGroup, Button } from "react-bootstrap";
 import { addItemToCart } from "../services/CartService";
 import { useAuth } from "../context/AuthContext";
 
@@ -17,6 +17,8 @@ const Home = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState(0);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -68,9 +70,22 @@ const Home = () => {
       });
   }, [selectedCategoryId]);
 
+  // Filter products based on search query
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredProducts(products);
+    } else {
+      const filtered = products.filter((product) =>
+        product.productName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+      setCurrentPage(1); // Reset to first page when searching
+    }
+  }, [searchQuery, products]);
+
   // Pagination logic
-  const totalPages = Math.ceil(products.length / PAGE_SIZE);
-  const paginatedProducts = products.slice(
+  const totalPages = Math.ceil(filteredProducts.length / PAGE_SIZE);
+  const paginatedProducts = filteredProducts.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   );
@@ -133,6 +148,14 @@ const Home = () => {
     }
   };
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+  };
+
   return (
     <div
       style={{
@@ -142,6 +165,45 @@ const Home = () => {
       }}
     >
       <main style={{ maxWidth: 1200, margin: "2rem auto", padding: "0 1rem" }}>
+        {/* Search Bar */}
+        <div style={{ marginBottom: "2rem" }}>
+          <InputGroup className="mb-3">
+            <Form.Control
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              aria-label="Search products"
+              style={{
+                borderRadius: "4px 0 0 4px",
+                padding: "0.6rem 1rem",
+                border: "1px solid #ccc",
+              }}
+            />
+            {searchQuery && (
+              <Button
+                variant="outline-secondary"
+                onClick={clearSearch}
+                style={{
+                  borderLeft: "none",
+                  borderRadius: "0",
+                }}
+              >
+                ✕
+              </Button>
+            )}
+            <Button
+              variant="primary"
+              style={{
+                background: "#3498db",
+                borderColor: "#3498db",
+                borderRadius: searchQuery ? "0 4px 4px 0" : "0 4px 4px 0",
+              }}
+            >
+              Search
+            </Button>
+          </InputGroup>
+        </div>
+
         {/* Category Filter */}
         <div
           style={{
@@ -360,9 +422,8 @@ const Home = () => {
                       padding: "0.5rem 1rem",
                       borderRadius: 4,
                       border: "1px solid #ccc",
-                      background: currentPage === i + 1 ? "#222" : "#fff",
+                      background: currentPage === i + 1 ? "#3498db" : "#fff",
                       color: currentPage === i + 1 ? "#fff" : "#222",
-                      fontWeight: currentPage === i + 1 ? "bold" : "normal",
                       cursor: "pointer",
                     }}
                   >

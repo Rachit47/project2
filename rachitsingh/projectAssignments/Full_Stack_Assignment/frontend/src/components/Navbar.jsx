@@ -56,16 +56,11 @@ const Navbar = () => {
               </>
             )}
 
-            {isAuthenticated && currentUser?.role !== "ROLE_MANAGER" && (
-              <>
-                <Nav.Link as={Link} to="/orders">
-                  Orders
-                </Nav.Link>
-                {/* <Nav.Link as={Link} to="/">
-                  Home
-                </Nav.Link> */}
-              </>
-            )}
+            <>
+              <Nav.Link as={Link} to="/orders">
+                Orders
+              </Nav.Link>
+            </>
           </Nav>
 
           <Nav>
