@@ -37,10 +37,21 @@ public class ProductApprovalController {
 	}
 
 	@PostMapping("/approve")
-	public String approveRequests(@RequestBody List<Long> productRequestIds) throws ProductDatabaseOperationException {
-		Long managerId = 4L;
-		productApprovalService.approveRequest(productRequestIds, RequestStatus.APPROVED, managerId);
-		return "Approved successfully";
+	public ResponseEntity<String> approveRequests(@RequestBody List<ApprovalActionRequest> requests) throws ProductDatabaseOperationException {
+//		Long managerId = 4L;
+		for (ApprovalActionRequest req : requests) {
+			if (req.getProductRequestIds() == null || req.getProductRequestIds().isEmpty()) {
+				throw new IllegalArgumentException("ProductRequestIds must not be null or empty.");
+			}
+			if (req.getManagerId() == null) {
+				throw new IllegalArgumentException("ManagerId must not be null.");
+			}
+
+			productApprovalService.approveRequest(req.getProductRequestIds(),  RequestStatus.APPROVED,
+					req.getManagerId());
+		}
+//		productApprovalService.approveRequest(productRequestIds, RequestStatus.APPROVED, managerId);
+		return ResponseEntity.ok("Approved successfully");
 	}
 
 	@PostMapping("/reject")

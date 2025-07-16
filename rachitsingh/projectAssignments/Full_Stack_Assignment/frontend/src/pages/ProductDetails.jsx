@@ -36,7 +36,6 @@ const ProductDetails = () => {
       </p>
       <p><strong>Brand:</strong> {product.brand}</p>
       <p><strong>Category:</strong> {product.categoryName}</p>
-      {/* Add more fields as needed */}
     </div>
   );
 };

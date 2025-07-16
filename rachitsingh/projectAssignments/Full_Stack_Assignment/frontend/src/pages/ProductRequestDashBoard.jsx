@@ -15,8 +15,8 @@ const ProductRequestDashboard = () => {
   const [filters, setFilters] = useState({
     requestIds: [],
     productNames: [],
-    status: [],
-    requestedBy: [],
+    status: "",
+    requestedBy: "",
   });
   const [requestForm, setRequestForm] = useState({
     productName: "",
@@ -41,11 +41,8 @@ const ProductRequestDashboard = () => {
           filters.requestIds.length > 0 ? filters.requestIds.map(Number) : null,
         productNames:
           filters.productNames.length > 0 ? filters.productNames : null,
-        status: filters.status.length > 0 ? filters.status : null,
-        requestedBy:
-          filters.requestedBy.length > 0
-            ? filters.requestedBy.map(Number)
-            : null,
+        status: filters.status || null,
+        requestedBy: filters.requestedBy ? Number(filters.requestedBy) : null,
       };
 
       const res = await searchProductRequests(payload);
@@ -138,7 +135,7 @@ const ProductRequestDashboard = () => {
         <h2 className="h4 fw-bold">Product Dashboard</h2>
         <button
           className="btn btn-outline-light btn-sm"
-          onClick={fetchFilteredData}
+          onClick={() => window.location.reload()}
         >
           Refresh
         </button>
@@ -165,7 +162,7 @@ const ProductRequestDashboard = () => {
                   <Form.Check
                     key={id}
                     type="checkbox"
-                    className="px-3"
+                    className="px-5 bg-dark text-light"
                     label={`#${id}`}
                     value={id}
                     checked={filters.requestIds.includes(String(id))}
@@ -201,7 +198,7 @@ const ProductRequestDashboard = () => {
                   <Form.Check
                     key={name}
                     type="checkbox"
-                    className="px-3"
+                    className="px-5 bg-dark text-light"
                     label={name}
                     value={name}
                     checked={filters.productNames.includes(name)}
@@ -222,58 +219,22 @@ const ProductRequestDashboard = () => {
 
           <div className="col-md-2">
             <label className="form-label">Status</label>
-            <Dropdown autoClose="outside">
-              <Dropdown.Toggle
-                className="form-control text-start"
-                variant="secondary"
-                id="dropdown-status"
-              >
-                {filters.status.length > 0
-                  ? `${filters.status.length} selected`
-                  : "Select Status"}
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                {statusOptions.map((status) => (
-                  <Form.Check
-                    key={status}
-                    type="checkbox"
-                    className="px-3"
-                    label={status}
-                    value={status}
-                    checked={filters.status.includes(status)}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setFilters((prev) => {
-                        const newStatus = prev.status.includes(value)
-                          ? prev.status.filter((v) => v !== value)
-                          : [...prev.status, value];
-                        return { ...prev, status: newStatus };
-                      });
-                    }}
-                  />
-                ))}
-              </Dropdown.Menu>
-            </Dropdown>
+            <select
+              className="form-select"
+              value={filters.status}
+              onChange={(e) =>
+                setFilters({ ...filters, status: e.target.value })
+              }
+            >
+              <option value="">Select Status</option>
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
           </div>
 
-          <div className="col-md-2">
-            <label className="form-label">Requested By</label>
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Comma-separated IDs"
-              value={filters.requestedBy.join(",")}
-              onChange={(e) =>
-                setFilters({
-                  ...filters,
-                  requestedBy: e.target.value
-                    .split(",")
-                    .map((id) => id.trim())
-                    .filter((id) => id),
-                })
-              }
-            />
-          </div>
           <div className="col-md-2 d-flex gap-2">
             <button
               className="btn btn-primary btn-sm mt-3"
