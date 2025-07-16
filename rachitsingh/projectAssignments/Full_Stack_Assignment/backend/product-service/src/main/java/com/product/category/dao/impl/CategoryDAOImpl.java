@@ -54,15 +54,15 @@ public class CategoryDAOImpl implements CategoryDAO{
 	   String insertLogSql = "INSERT INTO category_request_log (CategoryName, RequestedBy, Status, UpdatedAtDate) " +
                    "VALUES (:categoryName, :requestedBy, :status, :updatedAtDate)";
 
-	   for (Map<String, Object> row : recordsToLog) {
-		   MapSqlParameterSource logParams = new MapSqlParameterSource();
-		   logParams.addValue("categoryName", row.get("CategoryName"));
-		   logParams.addValue("requestedBy", row.get("RequestedBy"));
-		   logParams.addValue("status", row.get("Status"));
-		   logParams.addValue("updatedAtDate", row.get("UpdatedAtDate"));
-
-		   namedParameterJdbcTemplate.update(insertLogSql, logParams);
-	   }
+//	   for (Map<String, Object> row : recordsToLog) {
+//		   MapSqlParameterSource logParams = new MapSqlParameterSource();
+//		   logParams.addValue("categoryName", row.get("CategoryName"));
+//		   logParams.addValue("requestedBy", row.get("RequestedBy"));
+//		   logParams.addValue("status", row.get("Status"));
+//		   logParams.addValue("updatedAtDate", row.get("UpdatedAtDate"));
+//
+//		   namedParameterJdbcTemplate.update(insertLogSql, logParams);
+//	   }
 
 	    String sql = "UPDATE category_requests " +
 	                 "SET Status = :status, ApprovedBy = :approvedBy, UpdatedAtDate = :updatedAtDate " +

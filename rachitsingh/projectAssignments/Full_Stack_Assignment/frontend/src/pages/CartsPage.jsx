@@ -100,7 +100,7 @@ const CartPage = () => {
 
   return (
     <div className="p-6 text-white">
-      <h1 className="text-2xl font-semibold mb-4">My Cart</h1>
+      <h1 className="text-2xl font-semibold mb-4 text-black">My Cart</h1>
 
       {loading ? (
         <p>Loading...</p>

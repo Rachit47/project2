@@ -111,7 +111,13 @@ const Home = () => {
       const quantity = cartItems[product.productId] || 1;
       console.log(currentUser.userId, product.productId, quantity);
 
-      await addItemToCart(currentUser.userId, product.productId, quantity,product.price,product.productName);
+      await addItemToCart(
+        currentUser.userId,
+        product.productId,
+        quantity,
+        product.price,
+        product.productName
+      );
 
       // Reset states after adding to cart
       setAddingToCart((prev) => ({
@@ -543,7 +549,7 @@ const Home = () => {
           marginTop: "2rem",
         }}
       >
-        &copy; {new Date().getFullYear()} Shopify. All rights reserved.
+        &copy; {new Date().getFullYear()} E-Commerce App All rights reserved.
       </footer>
     </div>
   );

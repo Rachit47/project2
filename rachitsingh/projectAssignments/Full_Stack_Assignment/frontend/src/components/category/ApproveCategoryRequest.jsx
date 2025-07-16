@@ -4,11 +4,13 @@ import {
   getCategoryRequests,
   processCategoryRequest,
 } from "../../services/CategoryRequestService";
+import { useAuth } from "../../context/AuthContext";
 
 const ApproveCategoryRequests = () => {
+  const { currentUser } = useAuth();
+
   const [requests, setRequests] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
-  const [approvedBy, setApprovedBy] = useState(""); // Admin ID
   const [responseMsg, setResponseMsg] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -41,15 +43,10 @@ const ApproveCategoryRequests = () => {
     setErrorMsg(null);
     setResponseMsg(null);
 
-    if (!approvedBy || selectedIds.length === 0) {
-      setErrorMsg("Please provide Admin ID and select at least one request.");
-      return;
-    }
-
     try {
       await processCategoryRequest({
         requestIds: selectedIds,
-        approvedBy: parseInt(approvedBy),
+        approvedBy: currentUser.userId,
         status,
       });
 
@@ -73,16 +70,6 @@ const ApproveCategoryRequests = () => {
 
       {responseMsg && <Alert variant="success">{responseMsg}</Alert>}
       {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
-
-      <Form.Group controlId="adminId">
-        <Form.Label>Admin ID</Form.Label>
-        <Form.Control
-          type="number"
-          value={approvedBy}
-          onChange={(e) => setApprovedBy(e.target.value)}
-          placeholder="Enter your admin ID"
-        />
-      </Form.Group>
 
       <Table striped bordered hover className="mt-3">
         <thead>

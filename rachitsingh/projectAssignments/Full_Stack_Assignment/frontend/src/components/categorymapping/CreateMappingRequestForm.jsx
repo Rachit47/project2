@@ -67,16 +67,6 @@ const CreateMappingRequestForm = () => {
           />
         </Col>
 
-        <Col md={4}>
-          <FormField
-            label="Requested By (User ID)"
-            name="requestedBy"
-            type="number"
-            value={formData.requestedBy}
-            onChange={handleChange}
-          />
-        </Col>
-
         <Button variant="primary" type="submit" className="mt-3">
           Submit Request
         </Button>

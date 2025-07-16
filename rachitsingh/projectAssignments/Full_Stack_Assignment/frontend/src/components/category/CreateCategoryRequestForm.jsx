@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { createCategoryRequest } from "../../services/CategoryRequestService";
+import { useAuth } from "../../context/AuthContext";
 
 const CreateCategoryRequestForm = () => {
+  const { currentUser } = useAuth();
   const [categoryName, setCategoryName] = useState("");
-  const [requestedBy, setRequestedBy] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -12,11 +13,10 @@ const CreateCategoryRequestForm = () => {
       setLoading(true);
       await createCategoryRequest({
         categoryName,
-        requestedBy,
+        requestedBy: currentUser.userId,
       });
       alert("Category request submitted successfully!");
       setCategoryName("");
-      setRequestedBy("");
     } catch (error) {
       console.error("Error creating category request:", error);
       alert("Failed to create request.");
@@ -36,16 +36,6 @@ const CreateCategoryRequestForm = () => {
             className="form-control"
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group mb-3">
-          <label>Requested By (User ID):</label>
-          <input
-            type="number"
-            className="form-control"
-            value={requestedBy}
-            onChange={(e) => setRequestedBy(e.target.value)}
             required
           />
         </div>
