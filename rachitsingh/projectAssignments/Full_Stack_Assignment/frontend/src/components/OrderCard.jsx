@@ -64,7 +64,7 @@ const OrderCard = ({ order, onUpdateAddress, onClose }) => {
           </p>
         </div>
 
-        {order.status === "Processing" && (
+        {order.status === Object.keys(statusLabels)[0] && (
           <div className="col-md-6">
             <label className="form-label text-muted small">
               Update Address

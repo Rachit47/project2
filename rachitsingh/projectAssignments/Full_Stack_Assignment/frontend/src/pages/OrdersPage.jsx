@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import OrderTable from "../components/OrderTable";
 import OrderCard from "../components/OrderCard";
-
 import {
   fetchOrdersByCriteria,
   fetchOrderDetails,
@@ -10,11 +9,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 
 const OrdersPage = () => {
-  const statusLabels = {
-    P: "Processing",
-    C: "Cancelled",
-  };
-
+  const statusLabels = { P: "Processing", C: "Cancelled" };
   const statusOptions = ["P", "C"];
 
   const [orderIdsList, setOrderIdsList] = useState([]);
@@ -30,42 +25,37 @@ const OrdersPage = () => {
   const customerId = currentUser.userId;
 
   const [pageNumber, setPageNumber] = useState(0);
-  const [pageSize] = useState(5); 
+  const [pageSize] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
 
-  const buildCriteria = () => {
-    return {
-      customerId,
-      orderIds: filters.orderIds.length ? filters.orderIds.map(Number) : null,
-      orderStatuses: filters.statuses.length ? filters.statuses : null,
-      fromDate: filters.fromDate ? filters.fromDate + "T00:00:00" : null,
-      toDate: filters.toDate ? filters.toDate + "T23:59:59" : null,
-      pageNumber,
-      pageSize,
-      orderIdsFlag: filters.orderIds.length ? 1 : 0,
-      orderStatusFlag: filters.statuses.length ? 1 : 0,
-      fromDateFlag: filters.fromDate ? 1 : 0,
-      toDateFlag: filters.toDate ? 1 : 0,
-    };
-  };
+  const buildCriteria = (page = pageNumber, size = pageSize) => ({
+    customerId,
+    orderIds: filters.orderIds.length ? filters.orderIds.map(Number) : null,
+    orderStatuses: filters.statuses.length ? filters.statuses : null,
+    fromDate: filters.fromDate ? filters.fromDate + "T00:00:00" : null,
+    toDate: filters.toDate ? filters.toDate + "T23:59:59" : null,
+    pageNumber: page,
+    pageSize: size,
+    orderIdsFlag: filters.orderIds.length ? 1 : 0,
+    orderStatusFlag: filters.statuses.length ? 1 : 0,
+    fromDateFlag: filters.fromDate ? 1 : 0,
+    toDateFlag: filters.toDate ? 1 : 0,
+  });
 
   const fetchOrders = async () => {
     try {
       const criteria = buildCriteria();
-      console.log("Fetching orders with criteria:", criteria);
       const res = await fetchOrdersByCriteria(criteria);
-      console.log("API response:", res.data);
+
+      const countCriteria = buildCriteria(0, 9999);
+      const countRes = await fetchOrdersByCriteria(countCriteria);
+
       if (Array.isArray(res.data)) {
         setOrders(res.data);
-        const count = res.data.totalCount ?? res.data.length;
-        setTotalCount(count);
-        console.log(`Got ${res.data.length} orders, total: ${count}`);
-      } else if (res.data && res.data.records) {
+        setTotalCount(countRes.data.length);
+      } else if (res.data?.records) {
         setOrders(res.data.records);
-        setTotalCount(res.data.totalCount);
-        console.log(
-          `Got ${res.data.records.length} orders, total: ${res.data.totalCount}`
-        );
+        setTotalCount(countRes.data.records.length);
       } else {
         setOrders([]);
         setTotalCount(0);
@@ -79,94 +69,71 @@ const OrdersPage = () => {
 
   useEffect(() => {
     fetchOrders();
-  }, [pageNumber, pageSize]);
-
+  }, [pageNumber]);
 
   useEffect(() => {
-    console.log("Fetching order IDs for filter...");
-    fetchOrdersByCriteria({
-      customerId,
-      pageNumber: 0, 
-      pageSize: 100,
-    })
+    setPageNumber(0);
+    fetchOrders();
+  }, [filters]);
+
+  useEffect(() => {
+    fetchOrdersByCriteria({ customerId, pageNumber: 0, pageSize: 100 })
       .then((res) => {
-        console.log("Order IDs response:", res.data);
-        if (Array.isArray(res.data)) {
-          const uniqueIds = [...new Set(res.data.map((o) => o.orderId))];
-          setOrderIdsList(uniqueIds);
-          console.log("Unique order IDs:", uniqueIds);
-        } else if (res.data && res.data.records) {
-          const uniqueIds = [
-            ...new Set(res.data.records.map((o) => o.orderId)),
-          ];
-          setOrderIdsList(uniqueIds);
-          console.log("Unique order IDs from records:", uniqueIds);
-        }
+        const rawData = Array.isArray(res.data)
+          ? res.data
+          : res.data?.records ?? [];
+        const uniqueIds = [...new Set(rawData.map((o) => o.orderId))];
+        setOrderIdsList(uniqueIds);
       })
       .catch((err) => console.error("Error loading order IDs:", err));
   }, [customerId]);
 
+  const totalPages = Math.ceil(totalCount / pageSize);
+
   const handleView = async (orderId) => {
     try {
       const res = await fetchOrderDetails(orderId, customerId);
-      if (res?.data) {
-        setSelectedOrder(res.data);
-      }
+      if (res?.data) setSelectedOrder(res.data);
     } catch (err) {
-      console.error("Failed to fetch order details", err);
       alert("Could not load order details.");
     }
   };
 
   const handleCancel = async (orderId) => {
     try {
-      const payload = {
+      await updateOrder({
         customerId,
         orderIds: [orderId],
         addressFlag: false,
-      };
-
-      await updateOrder(payload);
+      });
       fetchOrders();
       setSelectedOrder(null);
       alert("Order cancelled successfully!");
-    } catch (err) {
-      console.error("Cancel failed", err);
+    } catch {
       alert("Failed to cancel order.");
     }
   };
 
   const handleAddressUpdate = async (newAddress) => {
     try {
-      const payload = {
+      await updateOrder({
         customerId,
         orderIds: [selectedOrder.orderId],
         address: newAddress,
         addressFlag: true,
-      };
-
-      await updateOrder(payload);
+      });
       fetchOrders();
       setSelectedOrder(null);
       alert("Address updated successfully!");
-    } catch (err) {
-      console.error("Address update failed", err);
+    } catch {
       alert("Failed to update address.");
     }
   };
 
-  
-  const totalPages = totalCount > 0 ? Math.ceil(totalCount / pageSize) : 1;
-
-  const applyFilters = () => {
-    setPageNumber(0);
-    fetchOrders();
-  };
+  const applyFilters = () => setFilters({ ...filters });
 
   const handleReset = () => {
     setFilters({ orderIds: [], statuses: [], fromDate: "", toDate: "" });
-    setPageNumber(0);
-    fetchOrders();
   };
 
   return (
@@ -192,7 +159,7 @@ const OrdersPage = () => {
               onChange={(e) => {
                 const selected = Array.from(
                   e.target.selectedOptions,
-                  (option) => option.value
+                  (o) => o.value
                 );
                 setFilters({ ...filters, orderIds: selected });
               }}
@@ -214,20 +181,17 @@ const OrdersPage = () => {
                   className="form-check-input"
                   checked={filters.statuses.includes(status)}
                   onChange={() => {
-                    setFilters((prev) => {
-                      const exists = prev.statuses.includes(status);
-                      return {
-                        ...prev,
-                        statuses: exists
-                          ? prev.statuses.filter((s) => s !== status)
-                          : [...prev.statuses, status],
-                      };
-                    });
+                    setFilters((prev) => ({
+                      ...prev,
+                      statuses: prev.statuses.includes(status)
+                        ? prev.statuses.filter((s) => s !== status)
+                        : [...prev.statuses, status],
+                    }));
                   }}
                   id={`check-${status}`}
                 />
                 <label className="form-check-label" htmlFor={`check-${status}`}>
-                  {statusLabels[status] || status}
+                  {statusLabels[status]}
                 </label>
               </div>
             ))}
@@ -282,18 +246,20 @@ const OrdersPage = () => {
         <button
           className="btn btn-outline-light btn-sm"
           onClick={() => setPageNumber((p) => Math.max(p - 1, 0))}
-          // disabled={pageNumber === 0}
+          disabled={pageNumber === 0}
         >
           Previous
         </button>
+
         <span>
           Page <strong>{pageNumber + 1}</strong> of{" "}
           <strong>{totalPages}</strong>
         </span>
+
         <button
           className="btn btn-outline-light btn-sm"
           onClick={() => setPageNumber((p) => p + 1)}
-          // disabled={pageNumber >= totalPages - 1}
+          disabled={pageNumber >= totalPages - 1}
         >
           Next
         </button>
