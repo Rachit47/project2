@@ -18,5 +18,5 @@ public class CartItem {
     private String productName;
     private Integer quantity;
     private BigDecimal price;   
-    private LocalDateTime addededAt;
+    private LocalDateTime addedAtDate;
 }

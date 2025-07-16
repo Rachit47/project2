@@ -35,7 +35,8 @@ public class CartDAOImpl implements CartDAO {
         item.setQuantity(rs.getInt("Quantity"));
         item.setPrice(rs.getBigDecimal("Price"));
         item.setProductName(rs.getString("ProductName"));
-        item.setAddededAt(rs.getTimestamp("AddedAtDate") != null ? rs.getTimestamp("AddedAtDate").toLocalDateTime() : null);
+        item.setUserId(rs.getLong("UserId"));
+        item.setAddedAtDate(rs.getTimestamp("AddedAtDate") != null ? rs.getTimestamp("AddedAtDate").toLocalDateTime() : null);
         return item;
     };
 
