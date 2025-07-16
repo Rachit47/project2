@@ -30,8 +30,8 @@ const OrdersPage = () => {
   const customerId = currentUser.userId;
 
   const [pageNumber, setPageNumber] = useState(0);
-  const [pageSize] = useState(10);
-  const [hasMore, setHasMore] = useState(true);
+  const [pageSize] = useState(5); 
+  const [totalCount, setTotalCount] = useState(0);
 
   const buildCriteria = () => {
     return {
@@ -51,35 +51,60 @@ const OrdersPage = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetchOrdersByCriteria(buildCriteria());
+      const criteria = buildCriteria();
+      console.log("Fetching orders with criteria:", criteria);
+      const res = await fetchOrdersByCriteria(criteria);
+      console.log("API response:", res.data);
       if (Array.isArray(res.data)) {
         setOrders(res.data);
-        setHasMore(res.data.length === pageSize);
+        const count = res.data.totalCount ?? res.data.length;
+        setTotalCount(count);
+        console.log(`Got ${res.data.length} orders, total: ${count}`);
+      } else if (res.data && res.data.records) {
+        setOrders(res.data.records);
+        setTotalCount(res.data.totalCount);
+        console.log(
+          `Got ${res.data.records.length} orders, total: ${res.data.totalCount}`
+        );
       } else {
         setOrders([]);
-        setHasMore(false);
+        setTotalCount(0);
       }
     } catch (err) {
       console.error("Error fetching orders:", err);
       setOrders([]);
-      setHasMore(false);
+      setTotalCount(0);
     }
   };
 
   useEffect(() => {
     fetchOrders();
-  }, [pageNumber]);
+  }, [pageNumber, pageSize]);
+
 
   useEffect(() => {
-    fetchOrdersByCriteria({ customerId, pageNumber: 0, pageSize: 100 })
+    console.log("Fetching order IDs for filter...");
+    fetchOrdersByCriteria({
+      customerId,
+      pageNumber: 0, 
+      pageSize: 100,
+    })
       .then((res) => {
+        console.log("Order IDs response:", res.data);
         if (Array.isArray(res.data)) {
           const uniqueIds = [...new Set(res.data.map((o) => o.orderId))];
           setOrderIdsList(uniqueIds);
+          console.log("Unique order IDs:", uniqueIds);
+        } else if (res.data && res.data.records) {
+          const uniqueIds = [
+            ...new Set(res.data.records.map((o) => o.orderId)),
+          ];
+          setOrderIdsList(uniqueIds);
+          console.log("Unique order IDs from records:", uniqueIds);
         }
       })
       .catch((err) => console.error("Error loading order IDs:", err));
-  }, []);
+  }, [customerId]);
 
   const handleView = async (orderId) => {
     try {
@@ -129,6 +154,9 @@ const OrdersPage = () => {
       alert("Failed to update address.");
     }
   };
+
+  
+  const totalPages = totalCount > 0 ? Math.ceil(totalCount / pageSize) : 1;
 
   const applyFilters = () => {
     setPageNumber(0);
@@ -254,15 +282,18 @@ const OrdersPage = () => {
         <button
           className="btn btn-outline-light btn-sm"
           onClick={() => setPageNumber((p) => Math.max(p - 1, 0))}
-          disabled={pageNumber === 0}
+          // disabled={pageNumber === 0}
         >
           Previous
         </button>
-        <span>Page {pageNumber + 1}</span>
+        <span>
+          Page <strong>{pageNumber + 1}</strong> of{" "}
+          <strong>{totalPages}</strong>
+        </span>
         <button
           className="btn btn-outline-light btn-sm"
-          onClick={() => hasMore && setPageNumber((p) => p + 1)}
-          disabled={!hasMore}
+          onClick={() => setPageNumber((p) => p + 1)}
+          // disabled={pageNumber >= totalPages - 1}
         >
           Next
         </button>
