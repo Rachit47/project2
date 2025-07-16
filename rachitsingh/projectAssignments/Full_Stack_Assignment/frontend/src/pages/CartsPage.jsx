@@ -78,7 +78,10 @@ const CartPage = () => {
 
   // Calculate subtotal, tax, and grand total
   const calculateTotals = () => {
-    const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+    const subtotal = cartItems.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
     const salesTax = subtotal * 0.1; // Assuming 10% tax rate
     const grandTotal = subtotal + salesTax - discount;
     return { subtotal, salesTax, grandTotal };
@@ -112,9 +115,15 @@ const CartPage = () => {
             >
               <div className="flex flex-col">
                 <p className="text-black font-semibold">{item.productName}</p>
-                <p>Price: ${item.price.toFixed(2)}</p>
-                <p>Quantity: {item.quantity}</p>
-                <p>Total: ${(item.price * item.quantity).toFixed(2)}</p>
+                <p className="text-black font-semibold">
+                  Price: ${item.price.toFixed(2)}
+                </p>
+                <p className="text-black font-semibold">
+                  Quantity: {item.quantity}
+                </p>
+                <p className="text-black font-semibold">
+                  Total: ${(item.price * item.quantity).toFixed(2)}
+                </p>
               </div>
               <button
                 className="bg-red-500 px-3 py-1 rounded"
@@ -127,20 +136,24 @@ const CartPage = () => {
 
           <div className="mt-4">
             <div className="flex justify-between mb-2">
-              <p>Subtotal:</p>
-              <p>${subtotal.toFixed(2)}</p>
+              <p className="text-black font-semibold">Subtotal:</p>
+              <p className="text-black font-semibold">${subtotal.toFixed(2)}</p>
             </div>
             <div className="flex justify-between mb-2">
-              <p>Sales Tax (10%):</p>
-              <p>${salesTax.toFixed(2)}</p>
+              <p className="text-black font-semibold">Sales Tax (10%):</p>
+              <p className="text-black font-semibold">${salesTax.toFixed(2)}</p>
             </div>
             <div className="flex justify-between mb-4">
-              <p>Discount:</p>
-              <p>-${discount.toFixed(2)}</p>
+              <p className="text-black font-semibold">Discount:</p>
+              <p className="text-black font-semibold">
+                -${discount.toFixed(2)}
+              </p>
             </div>
             <div className="flex justify-between mb-4 font-semibold">
-              <p>Grand Total:</p>
-              <p>${grandTotal.toFixed(2)}</p>
+              <p className="text-black font-semibold">Grand Total:</p>
+              <p className="text-black font-semibold">
+                ${grandTotal.toFixed(2)}
+              </p>
             </div>
 
             <div className="flex space-x-4">

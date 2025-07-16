@@ -1,27 +1,35 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE = '/api/cart';
+const BASE_URL = "http://localhost:8082/api/cart";
 
 export const getCartItems = (userId) => {
-  return axios.get(`${API_BASE}/${userId}/items`);
+  return axios.get(`${BASE_URL}/${userId}/items`);
 };
 
-export const addItemToCart = (userId, productId, quantity) => {
-  return axios.post(`${API_BASE}/add`, {
+export const addItemToCart = (
+  userId,
+  productId,
+  quantity,
+  price,
+  productName
+) => {
+  return axios.post(`${BASE_URL}/add`, {
     userId,
     productId,
-    quantity
+    quantity,
+    price,
+    productName,
   });
 };
 
 export const removeCartItem = (cartItemId) => {
-  return axios.delete(`${API_BASE}/item/${cartItemId}`);
+  return axios.delete(`${BASE_URL}/item/${cartItemId}`);
 };
 
 export const clearCart = (userId) => {
-  return axios.delete(`${API_BASE}/${userId}/clear`);
+  return axios.delete(`${BASE_URL}/${userId}/clear`);
 };
 
 export const checkoutCart = (userId) => {
-  return axios.post(`${API_BASE}/${userId}/checkout`);
+  return axios.post(`${BASE_URL}/${userId}/checkout`);
 };

@@ -34,7 +34,7 @@ public class CartDAOImpl implements CartDAO {
         item.setProductId(rs.getLong("ProductId"));
         item.setQuantity(rs.getInt("Quantity"));
         item.setPrice(rs.getBigDecimal("Price"));
-        item.setProductName("ProductName");
+        item.setProductName(rs.getString("ProductName"));
         item.setAddededAt(rs.getTimestamp("AddedAtDate") != null ? rs.getTimestamp("AddedAtDate").toLocalDateTime() : null);
         return item;
     };
@@ -62,6 +62,7 @@ public class CartDAOImpl implements CartDAO {
                 .addValue("quantity", item.getQuantity())
                 .addValue("price", item.getPrice())
         		.addValue("productName",item.getProductName());
+        System.out.println(params);
         jdbcTemplate.update(sql, params);
     }
 
