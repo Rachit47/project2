@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { Overlay, Popover } from "react-bootstrap";
+import { addItemToCart } from "../services/CartService";
+import { useAuth } from "../context/AuthContext";
 
 // Generate a stable random image per product using Picsum
 const getRandomImage = (seed) => `https://picsum.photos/seed/${seed}/400/300`;
@@ -6,6 +9,8 @@ const getRandomImage = (seed) => `https://picsum.photos/seed/${seed}/400/300`;
 const PAGE_SIZE = 6; // Number of products per page
 
 const Home = () => {
+  const { currentUser } = useAuth();
+
   const [categories, setCategories] = useState([
     { categoryId: 0, categoryName: "All" },
   ]);
@@ -15,6 +20,15 @@ const Home = () => {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Product detail popover state
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showPopover, setShowPopover] = useState(false);
+  const [target, setTarget] = useState(null);
+
+  // Cart state
+  const [cartItems, setCartItems] = useState({});
+  const [addingToCart, setAddingToCart] = useState({});
 
   // Fetch all categories
   useEffect(() => {
@@ -49,7 +63,7 @@ const Home = () => {
         setProducts(productList);
         setLoading(false);
       })
-      .catch((err) => {
+      .catch(() => {
         setLoading(false);
       });
   }, [selectedCategoryId]);
@@ -64,6 +78,54 @@ const Home = () => {
   const handlePrev = () => setCurrentPage((p) => Math.max(1, p - 1));
   const handleNext = () => setCurrentPage((p) => Math.min(totalPages, p + 1));
   const handlePageClick = (page) => setCurrentPage(page);
+
+  // Close popover
+  const handlePopoverClose = () => {
+    setShowPopover(false);
+  };
+
+  // Cart functionality
+  const handleAddToCartClick = (productId) => {
+    setAddingToCart((prev) => ({
+      ...prev,
+      [productId]: true,
+    }));
+    setCartItems((prev) => ({
+      ...prev,
+      [productId]: 1,
+    }));
+  };
+
+  const handleQuantityChange = (productId, change) => {
+    setCartItems((prev) => {
+      const newQuantity = Math.max(1, (prev[productId] || 1) + change);
+      return {
+        ...prev,
+        [productId]: newQuantity,
+      };
+    });
+  };
+
+  const handleConfirmAddToCart = async (product) => {
+    try {
+      const quantity = cartItems[product.productId] || 1;
+      console.log(currentUser.userId, product.productId, quantity);
+
+      await addItemToCart(currentUser.userId, product.productId, quantity,product.price);
+
+      // Reset states after adding to cart
+      setAddingToCart((prev) => ({
+        ...prev,
+        [product.productId]: false,
+      }));
+
+      // You might want to show a success message here
+      alert(`Added ${quantity} ${product.productName}(s) to cart!`);
+    } catch (error) {
+      console.error("Error adding item to cart:", error);
+      alert("Failed to add item to cart. Please try again.");
+    }
+  };
 
   return (
     <div
@@ -121,19 +183,20 @@ const Home = () => {
                 gap: "2rem",
               }}
             >
-              {paginatedProducts.map((product, index) => (
+              {paginatedProducts.map((product) => (
                 <div
-                  key={product.id ?? `product-${index}`}
+                  key={product.productId}
                   style={{
                     background: "#fff",
                     borderRadius: 8,
                     boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
                     padding: "1rem",
                     textAlign: "center",
+                    position: "relative",
                   }}
                 >
                   <img
-                    src={getRandomImage(product.id ?? index)}
+                    src={getRandomImage(product.productId)}
                     alt={product.productName}
                     style={{
                       width: "100%",
@@ -154,20 +217,109 @@ const Home = () => {
                   >
                     ₹{product.price}
                   </p>
-                  <button
+                  <div
                     style={{
-                      marginTop: "0.5rem",
-                      padding: "0.5rem 1.5rem",
-                      background: "#222",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: 4,
-                      cursor: "pointer",
-                      fontWeight: "bold",
+                      display: "flex",
+                      gap: "8px",
+                      justifyContent: "center",
                     }}
                   >
-                    Add to Cart
-                  </button>
+                    <button
+                      style={{
+                        marginTop: "0.5rem",
+                        padding: "0.5rem 1rem",
+                        background: "#3498db",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 4,
+                        cursor: "pointer",
+                        fontWeight: "bold",
+                      }}
+                      onClick={(e) => {
+                        setSelectedProduct(product);
+                        setShowPopover(!showPopover);
+                        setTarget(e.target);
+                      }}
+                    >
+                      View Details
+                    </button>
+                    {addingToCart[product.productId] ? (
+                      <div
+                        style={{
+                          marginTop: "0.5rem",
+                          display: "flex",
+                          gap: "8px",
+                          alignItems: "center",
+                        }}
+                      >
+                        <button
+                          onClick={() =>
+                            handleQuantityChange(product.productId, -1)
+                          }
+                          style={{
+                            padding: "0.25rem 0.5rem",
+                            background: "#222",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: 4,
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          -
+                        </button>
+                        <span style={{ margin: "0 8px" }}>
+                          {cartItems[product.productId] || 1}
+                        </span>
+                        <button
+                          onClick={() =>
+                            handleQuantityChange(product.productId, 1)
+                          }
+                          style={{
+                            padding: "0.25rem 0.5rem",
+                            background: "#222",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: 4,
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          +
+                        </button>
+                        <button
+                          onClick={() => handleConfirmAddToCart(product)}
+                          style={{
+                            padding: "0.25rem 0.5rem",
+                            background: "#27ae60",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: 4,
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          Confirm
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleAddToCartClick(product.productId)}
+                        style={{
+                          marginTop: "0.5rem",
+                          padding: "0.5rem 1rem",
+                          background: "#222",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: 4,
+                          cursor: "pointer",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Add to Cart
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -230,6 +382,157 @@ const Home = () => {
           </>
         )}
       </main>
+
+      {/* Product Detail Popover */}
+      {selectedProduct && (
+        <Overlay
+          show={showPopover}
+          target={target}
+          placement="auto"
+          container={document.body}
+          rootClose
+          onHide={handlePopoverClose}
+        >
+          <Popover id="product-popover" style={{ maxWidth: "400px" }}>
+            <Popover.Header as="h3">
+              {selectedProduct.productName}
+            </Popover.Header>
+            <Popover.Body>
+              <img
+                src={getRandomImage(selectedProduct.productId)}
+                alt={selectedProduct.productName}
+                style={{
+                  width: "100%",
+                  height: "350px",
+                  objectFit: "cover",
+                  borderRadius: 4,
+                  marginBottom: 10,
+                }}
+              />
+              {selectedProduct.description && (
+                <p style={{ fontSize: "0.9rem", marginBottom: "8px" }}>
+                  {selectedProduct.description}
+                </p>
+              )}
+              <p style={{ fontSize: "0.9rem", marginBottom: "4px" }}>
+                <strong>Price:</strong> ₹{selectedProduct.price}
+              </p>
+
+              {selectedProduct.quantity && (
+                <p style={{ fontSize: "0.9rem", marginBottom: "4px" }}>
+                  <strong>Quantity:</strong> {selectedProduct.quantity}
+                </p>
+              )}
+              <p style={{ fontSize: "0.9rem", marginBottom: "4px" }}>
+                <strong>Rating:</strong> {selectedProduct.averageRating}
+              </p>
+              <div style={{ display: "flex", gap: 10, marginTop: "10px" }}>
+                {addingToCart[selectedProduct.productId] ? (
+                  <>
+                    <div
+                      style={{
+                        display: "flex",
+                        flex: 1,
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <button
+                        onClick={() =>
+                          handleQuantityChange(selectedProduct.productId, -1)
+                        }
+                        style={{
+                          padding: "0.25rem 0.5rem",
+                          background: "#222",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: 4,
+                          cursor: "pointer",
+                          fontSize: "0.9rem",
+                        }}
+                      >
+                        -
+                      </button>
+                      <span style={{ margin: "0 8px" }}>
+                        {cartItems[selectedProduct.productId] || 1}
+                      </span>
+                      <button
+                        onClick={() =>
+                          handleQuantityChange(selectedProduct.productId, 1)
+                        }
+                        style={{
+                          padding: "0.25rem 0.5rem",
+                          background: "#222",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: 4,
+                          cursor: "pointer",
+                          fontSize: "0.9rem",
+                        }}
+                      >
+                        +
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => {
+                        handleConfirmAddToCart(selectedProduct);
+                        handlePopoverClose();
+                      }}
+                      style={{
+                        flex: 1,
+                        padding: "0.5rem",
+                        background: "#27ae60",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 4,
+                        cursor: "pointer",
+                        fontSize: "0.9rem",
+                      }}
+                    >
+                      Confirm
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() =>
+                        handleAddToCartClick(selectedProduct.productId)
+                      }
+                      style={{
+                        flex: 1,
+                        padding: "0.5rem",
+                        background: "#222",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 4,
+                        cursor: "pointer",
+                        fontSize: "0.9rem",
+                      }}
+                    >
+                      Add to Cart
+                    </button>
+                    <button
+                      onClick={handlePopoverClose}
+                      style={{
+                        flex: 1,
+                        padding: "0.5rem",
+                        background: "#ddd",
+                        color: "#222",
+                        border: "none",
+                        borderRadius: 4,
+                        cursor: "pointer",
+                        fontSize: "0.9rem",
+                      }}
+                    >
+                      Close
+                    </button>
+                  </>
+                )}
+              </div>
+            </Popover.Body>
+          </Popover>
+        </Overlay>
+      )}
 
       <footer
         style={{

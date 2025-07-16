@@ -83,6 +83,19 @@ const Navbar = () => {
                 <BootstrapNavbar.Text className="me-3">
                   Welcome, {currentUser?.fullName || currentUser?.username}
                 </BootstrapNavbar.Text>
+
+                {isAuthenticated && currentUser?.role === "ROLE_USER" && (
+                  <Nav.Link
+                    as={Link}
+                    to="/cart"
+                    className="position-relative me-3"
+                  >
+                    <i
+                      className="bi bi-cart"
+                      style={{ fontSize: "1.25rem" }}
+                    ></i>
+                  </Nav.Link>
+                )}
                 <Button variant="outline-light" size="sm" onClick={logout}>
                   Logout
                 </Button>
