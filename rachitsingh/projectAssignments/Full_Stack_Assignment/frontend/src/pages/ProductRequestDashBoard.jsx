@@ -3,6 +3,7 @@ import {
   createProductRequest,
   searchProductRequests,
 } from "../services/ProductRequestService";
+import { Dropdown, Form } from "react-bootstrap";
 
 const ProductRequestDashboard = () => {
   const [pageNumber, setPageNumber] = useState(0);
@@ -149,75 +150,112 @@ const ProductRequestDashboard = () => {
         <div className="row g-3 align-items-end">
           <div className="col-md-3">
             <label className="form-label">Request IDs</label>
-            <select
-              className="form-select"
-              multiple
-              value={filters.requestIds}
-              onChange={(e) =>
-                setFilters({
-                  ...filters,
-                  requestIds: Array.from(
-                    e.target.selectedOptions,
-                    (opt) => opt.value
-                  ),
-                })
-              }
-              size={Math.min(5, allRequestIds.length) || 2}
-            >
-              {allRequestIds.map((id) => (
-                <option key={id} value={id}>
-                  #{id}
-                </option>
-              ))}
-            </select>
+            <Dropdown autoClose="outside">
+              <Dropdown.Toggle
+                className="form-control text-start"
+                variant="secondary"
+                id="dropdown-request-ids"
+              >
+                {filters.requestIds.length > 0
+                  ? `${filters.requestIds.length} selected`
+                  : "Select Request IDs"}
+              </Dropdown.Toggle>
+              <Dropdown.Menu style={{ maxHeight: "200px", overflowY: "auto" }}>
+                {allRequestIds.map((id) => (
+                  <Form.Check
+                    key={id}
+                    type="checkbox"
+                    className="px-3"
+                    label={`#${id}`}
+                    value={id}
+                    checked={filters.requestIds.includes(String(id))}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFilters((prev) => {
+                        const newIds = prev.requestIds.includes(value)
+                          ? prev.requestIds.filter((v) => v !== value)
+                          : [...prev.requestIds, value];
+                        return { ...prev, requestIds: newIds };
+                      });
+                    }}
+                  />
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
           </div>
+
           <div className="col-md-3">
             <label className="form-label">Product Names</label>
-            <select
-              className="form-select"
-              multiple
-              value={filters.productNames}
-              onChange={(e) =>
-                setFilters({
-                  ...filters,
-                  productNames: Array.from(
-                    e.target.selectedOptions,
-                    (opt) => opt.value
-                  ),
-                })
-              }
-              size={Math.min(5, allProductNames.length) || 2}
-            >
-              {allProductNames.map((name, idx) => (
-                <option key={idx} value={name}>
-                  {name}
-                </option>
-              ))}
-            </select>
+            <Dropdown autoClose="outside">
+              <Dropdown.Toggle
+                className="form-control text-start"
+                variant="secondary"
+                id="dropdown-product-names"
+              >
+                {filters.productNames.length > 0
+                  ? `${filters.productNames.length} selected`
+                  : "Select Product Names"}
+              </Dropdown.Toggle>
+              <Dropdown.Menu style={{ maxHeight: "200px", overflowY: "auto" }}>
+                {allProductNames.map((name) => (
+                  <Form.Check
+                    key={name}
+                    type="checkbox"
+                    className="px-3"
+                    label={name}
+                    value={name}
+                    checked={filters.productNames.includes(name)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFilters((prev) => {
+                        const newNames = prev.productNames.includes(value)
+                          ? prev.productNames.filter((v) => v !== value)
+                          : [...prev.productNames, value];
+                        return { ...prev, productNames: newNames };
+                      });
+                    }}
+                  />
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
           </div>
+
           <div className="col-md-2">
             <label className="form-label">Status</label>
-            <select
-              className="form-select"
-              multiple
-              value={filters.status}
-              onChange={(e) =>
-                setFilters({
-                  ...filters,
-                  status: Array.from(
-                    e.target.selectedOptions,
-                    (opt) => opt.value
-                  ),
-                })
-              }
-            >
-              {statusOptions.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
+            <Dropdown autoClose="outside">
+              <Dropdown.Toggle
+                className="form-control text-start"
+                variant="secondary"
+                id="dropdown-status"
+              >
+                {filters.status.length > 0
+                  ? `${filters.status.length} selected`
+                  : "Select Status"}
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                {statusOptions.map((status) => (
+                  <Form.Check
+                    key={status}
+                    type="checkbox"
+                    className="px-3"
+                    label={status}
+                    value={status}
+                    checked={filters.status.includes(status)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFilters((prev) => {
+                        const newStatus = prev.status.includes(value)
+                          ? prev.status.filter((v) => v !== value)
+                          : [...prev.status, value];
+                        return { ...prev, status: newStatus };
+                      });
+                    }}
+                  />
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
           </div>
+
           <div className="col-md-2">
             <label className="form-label">Requested By</label>
             <input
@@ -312,16 +350,19 @@ const ProductRequestDashboard = () => {
           </div>
           <div className="d-flex gap-2">
             <button
-              className="btn btn-sm btn-outline-light"
+              className="btn btn-sm btn-outline-light cursor-pointer"
               onClick={() => setPageNumber((prev) => prev - 1)}
               disabled={pageNumber <= 0}
             >
               ← Prev
             </button>
             <button
-              className="btn btn-sm btn-outline-light"
-              onClick={() => setPageNumber((prev) => prev + 1)}
-              disabled={pageNumber >= totalPages - 1}
+              className="btn btn-sm btn-outline-light cursor-pointer"
+              onClick={() => {
+                setPageNumber((prev) => prev + 1);
+                console.log("hello");
+              }}
+              // disabled={pageNumber >= totalPages - 1}
             >
               Next →
             </button>
