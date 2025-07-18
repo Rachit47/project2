@@ -79,7 +79,7 @@ const Navbar = () => {
                   Welcome, {currentUser?.fullName || currentUser?.username}
                 </BootstrapNavbar.Text>
 
-                {isAuthenticated && currentUser?.role !== "ROLE_MANAGER" && (
+                {isAuthenticated && (
                   <Nav.Link
                     as={Link}
                     to="/cart"

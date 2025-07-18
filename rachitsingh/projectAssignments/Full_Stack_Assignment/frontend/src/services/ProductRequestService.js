@@ -1,12 +1,12 @@
-import axios from "axios";
+import { makeRequest } from "./AxiosTemplate";
 
-const API_BASE = "http://localhost:8080/api/product-requests";
+const API_BASE = "/api/product-requests";
 
 export const createProductRequest = (data) =>
-  axios.post(`${API_BASE}/create`, data);
+  makeRequest("POST", `${API_BASE}/create`, {}, {}, data);
 
 export const searchProductRequests = (criteria) =>
-  axios.post(`${API_BASE}/search`, criteria);
+  makeRequest("POST", `${API_BASE}/search`, {}, {}, criteria);
 
 export const updateProductRequest = (data) =>
-  axios.put(`${API_BASE}/update`, data);
+  makeRequest("PUT", `${API_BASE}/update`, {}, {}, data);

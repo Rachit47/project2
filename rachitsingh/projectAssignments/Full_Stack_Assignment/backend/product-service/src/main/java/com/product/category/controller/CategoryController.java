@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,13 +35,7 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
     
-    @GetMapping("/hii")
-    public String khj() {
-    	return "lsdkjfd";
-    }
-
-    
-    
+    @PreAuthorize("hasRole('ROLE_CATEGORY_EXE')")
     @PostMapping("/request")
     public ResponseEntity<String> createCategoryRequest(@RequestBody CategoryRequest categoryRequest) {
         try {
@@ -57,6 +52,7 @@ public class CategoryController {
         }
     }
     
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     @PostMapping("/request/process")
     public ResponseEntity<String> processCategoryRequest(@RequestBody UpdateCategoryRequestPayload payload) {
         try {
@@ -95,7 +91,7 @@ public class CategoryController {
         }
     }
 
-    
+    @PreAuthorize("hasAnyRole('MANAGER', 'CATEGORY_EXE')")
     @GetMapping("/request/search")
     public ResponseEntity<List<CategoryRequest>> getCategoryRequestGet(
     		@RequestParam(required = false) Long requestId,
@@ -123,7 +119,7 @@ public class CategoryController {
         }
     }
 
-
+    @PreAuthorize("hasAnyRole('MANAGER', 'CATEGORY_EXE')")
     @PostMapping("/request/search")
     public ResponseEntity<List<CategoryRequest>> getCategoryRequest(
             @RequestBody CategoryRequestSearchCriteria searchCriteria) {
@@ -141,6 +137,7 @@ public class CategoryController {
             return ResponseEntity.badRequest().body(null);
     }
   
+    @PreAuthorize("hasRole('ROLE_CATEGORY_EXE')")
     @PostMapping
     public ResponseEntity<String> createCategory(@RequestBody Category category) {
         try {
@@ -155,6 +152,7 @@ public class CategoryController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER', 'CATEGORY_EXE','USER','PRODUCT_EXE')")
     @PostMapping("/search")
     public ResponseEntity<List<Category>> getCategory(
             @RequestBody CategorySearchCriteria searchCriteria) {
@@ -168,6 +166,7 @@ public class CategoryController {
 			}
         }
     
+    @PreAuthorize("hasAnyRole('MANAGER', 'CATEGORY_EXE','USER','PRODUCT_EXE')")
     @GetMapping("/search")
     public ResponseEntity<List<Category>> searchCategories(
             @RequestParam(required = false) String categoryName,
@@ -175,7 +174,6 @@ public class CategoryController {
         try {
             CategorySearchCriteria criteria = new CategorySearchCriteria();
             criteria.setCategoryNames(categoryName);
-            
             
             List<Category> categories = categoryService.getCategoryService(criteria);
             return ResponseEntity.ok(categories);

@@ -29,12 +29,11 @@ const LoginForm = () => {
       const res = await loginUser(formData,"http://localhost:8081");
       setResponse({ success: true, message: "Login successful!" });
 
-      // Use the login method from AuthContext instead of directly setting localStorage
       login(res.data.user, res.data.token);
 
       setTimeout(() => {
         navigate("/");
-      }, 1500);
+      }, 500);
     } catch (error) {
       setResponse({
         success: false,

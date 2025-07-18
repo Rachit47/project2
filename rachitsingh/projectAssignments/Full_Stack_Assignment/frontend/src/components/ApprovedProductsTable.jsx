@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { getApprovedProducts } from "../api/productApi";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { getApprovedProducts } from "../services/productApi";
 
 const ApprovedProductsTable = ({ refresh }) => {
   const [allProducts, setAllProducts] = useState([]);
@@ -10,21 +10,24 @@ const ApprovedProductsTable = ({ refresh }) => {
   const observerRef = useRef();
   useEffect(() => {
     getApprovedProducts().then((res) => {
-      setAllProducts(res.data);
+      setAllProducts(res);
       setCurrentPage(1);
-      setVisibleProducts(res.data.slice(0, pageSize));
+      setVisibleProducts(res.slice(0, pageSize));
     });
   }, [refresh]);
 
-  const lastRowRef = useCallback((node) => {
-    if (observerRef.current) observerRef.current.disconnect();
-    observerRef.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
-        loadMore();
-      }
-    });
-    if (node) observerRef.current.observe(node);
-  }, [visibleProducts]);
+  const lastRowRef = useCallback(
+    (node) => {
+      if (observerRef.current) observerRef.current.disconnect();
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      });
+      if (node) observerRef.current.observe(node);
+    },
+    [visibleProducts]
+  );
 
   const loadMore = () => {
     const nextPage = currentPage + 1;
@@ -36,7 +39,10 @@ const ApprovedProductsTable = ({ refresh }) => {
   };
 
   return (
-    <div className="card bg-dark text-white p-3 shadow" style={{ maxHeight: "500px", overflowY: "auto" }}>
+    <div
+      className="card bg-dark text-white p-3 shadow"
+      style={{ maxHeight: "500px", overflowY: "auto" }}
+    >
       <h4>Approved Products</h4>
       <table className="table table-dark table-striped table-bordered mt-3">
         <thead>

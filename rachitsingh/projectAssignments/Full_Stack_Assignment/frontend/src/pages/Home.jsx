@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Overlay, Popover, Form, InputGroup, Button } from "react-bootstrap";
 import { addItemToCart } from "../services/CartService";
 import { useAuth } from "../context/AuthContext";
+import { makeRequest } from "../services/AxiosTemplate";
+import { getAllCategories } from "../services/CategoryService";
 
 // Generate a stable random image per product using Picsum
 const getRandomImage = (seed) => `https://picsum.photos/seed/${seed}/400/300`;
@@ -32,42 +34,53 @@ const Home = () => {
   const [cartItems, setCartItems] = useState({});
   const [addingToCart, setAddingToCart] = useState({});
 
-  // Fetch all categories
   useEffect(() => {
-    fetch("http://localhost:8080/categories/search")
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setCategories([{ categoryId: 0, categoryName: "All" }, ...data]);
-        }
-      })
-      .catch((err) => console.error("Error fetching categories:", err));
-  }, []);
+  const fetchCategories = async () => {
+    try {
+      const data = await getAllCategories();
+      if (Array.isArray(data)) {
+        setCategories([{ categoryId: 0, categoryName: "All" }, ...data]);
+      }
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+    }
+  };
 
-  // Fetch products for selected category
+  fetchCategories();
+}, []);
+
   useEffect(() => {
-    setLoading(true);
-    setCurrentPage(1); // Reset to first page on category change
-    const url =
-      selectedCategoryId === 0
-        ? "http://localhost:8080/api/product-approval/products"
-        : `http://localhost:8080/api/category-product-mappings/category/${selectedCategoryId}/products`;
+    const fetchProducts = async () => {
+      setLoading(true);
+      setCurrentPage(1); // Reset to first page on category change
 
-    fetch(url)
-      .then((res) => res.json())
-      .then((response) => {
+      try {
+        const url =
+          selectedCategoryId === 0
+            ? "/api/product-approval/products"
+            : "/api/category-product-mappings/category/:id/products";
+
+        const pathVars =
+          selectedCategoryId === 0 ? {} : { id: selectedCategoryId };
+
+        const response = await makeRequest("GET", url, pathVars);
+
         let productList = [];
         if (Array.isArray(response)) {
           productList = response;
         } else if (response.success && Array.isArray(response.data)) {
           productList = response.data;
         }
+
         setProducts(productList);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchProducts();
   }, [selectedCategoryId]);
 
   // Filter products based on search query

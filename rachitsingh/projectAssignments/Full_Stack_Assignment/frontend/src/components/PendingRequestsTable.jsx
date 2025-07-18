@@ -1,18 +1,18 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useAuth } from "../context/AuthContext";
 import {
-  getPendingRequests,
   approveRequests,
+  getPendingRequests,
   rejectRequests,
-} from '../api/productApi';
-import { useAuth } from '../context/AuthContext';
+} from "../services/productApi";
 
 const PendingRequestsTable = () => {
   const [allRequests, setAllRequests] = useState([]);
   const [visibleRequests, setVisibleRequests] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const {currentUser} = useAuth();
+  const { currentUser } = useAuth();
   const managerId = currentUser.userId;
 
   const pageSize = 5;
@@ -25,12 +25,12 @@ const PendingRequestsTable = () => {
   const fetchPending = async () => {
     try {
       const response = await getPendingRequests();
-      if (Array.isArray(response.data)) {
-        setAllRequests(response.data);
+      if (Array.isArray(response)) {
+        setAllRequests(response);
         setCurrentPage(1);
-        setVisibleRequests(response.data.slice(0, pageSize));
+        setVisibleRequests(response.slice(0, pageSize));
       } else {
-        console.error("Expected array, got:", response.data);
+        console.error("Expected array, got:", response);
       }
     } catch (err) {
       console.error("Error fetching pending requests:", err);
@@ -65,27 +65,30 @@ const PendingRequestsTable = () => {
     );
   };
 
- const handleAction = async (type) => {
-  if (selectedIds.length === 0) return;
+  const handleAction = async (type) => {
+    if (selectedIds.length === 0) return;
 
-  try {
-    if (type === 'approve') {
-      await approveRequests(selectedIds, managerId);
-    } else {
-      await rejectRequests(selectedIds, managerId);
+    try {
+      if (type === "approve") {
+        await approveRequests(selectedIds, managerId);
+      } else {
+        await rejectRequests(selectedIds, managerId);
+      }
+
+      setMessage(`Successfully ${type}d selected requests.`);
+      setSelectedIds([]);
+      fetchPending();
+    } catch (err) {
+      console.error(`${type} failed:`, err);
+      setMessage(`${type} failed`);
     }
-
-    setMessage(`Successfully ${type}d selected requests.`);
-    setSelectedIds([]);
-    fetchPending();
-  } catch (err) {
-    console.error(`${type} failed:`, err);
-    setMessage(`${type} failed`);
-  }
-};
+  };
 
   return (
-    <div className="card bg-dark text-white p-3 mb-4 shadow" style={{ maxHeight: "500px", overflowY: "auto" }}>
+    <div
+      className="card bg-dark text-white p-3 mb-4 shadow"
+      style={{ maxHeight: "500px", overflowY: "auto" }}
+    >
       <h4>Pending Product Requests</h4>
       {message && <div className="alert alert-info mt-2">{message}</div>}
       <table className="table table-dark table-striped table-bordered mt-3">
@@ -104,10 +107,7 @@ const PendingRequestsTable = () => {
           {visibleRequests.map((req, idx) => {
             const isLast = idx === visibleRequests.length - 1;
             return (
-              <tr
-                key={req.productRequestId}
-                ref={isLast ? lastRowRef : null}
-              >
+              <tr key={req.productRequestId} ref={isLast ? lastRowRef : null}>
                 <td>
                   <input
                     type="checkbox"
@@ -127,10 +127,16 @@ const PendingRequestsTable = () => {
         </tbody>
       </table>
       <div className="d-flex gap-2">
-        <button className="btn btn-success" onClick={() => handleAction('approve')}>
+        <button
+          className="btn btn-success"
+          onClick={() => handleAction("approve")}
+        >
           Approve Selected
         </button>
-        <button className="btn btn-danger" onClick={() => handleAction('reject')}>
+        <button
+          className="btn btn-danger"
+          onClick={() => handleAction("reject")}
+        >
           Reject Selected
         </button>
       </div>

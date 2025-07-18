@@ -47,11 +47,11 @@ const ProductRequestDashboard = () => {
       };
 
       const res = await searchProductRequests(payload);
-      const data = res.data.records || res.data;
-      const count = res.data.totalCount ?? data.length;
+
+      const data = res ? res : [];
 
       setProductRequests(data);
-      setTotalCount(count);
+      setTotalCount(data.length);
 
       setAllRequestIds([...new Set(data.map((r) => r.productRequestId))]);
       setAllProductNames([...new Set(data.map((r) => r.productName))]);
@@ -61,10 +61,12 @@ const ProductRequestDashboard = () => {
       }
     } catch (err) {
       if (err.response?.status === 404) {
+        console.log("No product requests found for the given filter criteria.");
         setProductRequests([]);
         setTotalCount(0);
         alert("No product requests found for the given filter criteria.");
       } else {
+        console.error("Fetch error:", err);
         alert(
           "Something went wrong while fetching data: " +
             (err.response?.data?.message || err.message)

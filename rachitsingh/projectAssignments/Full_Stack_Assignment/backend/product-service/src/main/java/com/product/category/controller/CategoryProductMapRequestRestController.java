@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +37,7 @@ public class CategoryProductMapRequestRestController {
         this.categoryProductMappingRequestService = categoryProductMappingRequestService;
     }
 
+    @PreAuthorize("hasRole('ROLE_CATEGORY_EXE')")
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<CategoryProductMappingRequest>> createCategoryProductMappingRequest(
             @RequestBody CategoryProductMappingRequest mappingRequest) {
@@ -52,6 +54,7 @@ public class CategoryProductMapRequestRestController {
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     @PostMapping("/update-status")
     public ResponseEntity<ApiResponse<String>> updateMappingRequestStatus(
             @RequestBody UpdateMappingRequestStatusRequest request) {
@@ -71,7 +74,7 @@ public class CategoryProductMapRequestRestController {
         }
     }
 
-
+    @PreAuthorize("hasAnyRole('MANAGER', 'CATEGORY_EXE')")
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<CategoryProductMappingRequest>>> getMappingRequests(
             @RequestParam(required = false) List<Long> requestIds,

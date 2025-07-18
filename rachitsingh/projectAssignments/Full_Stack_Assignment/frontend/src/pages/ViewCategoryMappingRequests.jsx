@@ -141,7 +141,7 @@ const ViewCategoryMappingRequests = () => {
               <td>{request.approvedBy ?? "—"}</td>
               <td>{new Date(request.createdAtDate).toLocaleString()}</td>
               <td>{new Date(request.updatedAtDate).toLocaleString()}</td>
-              {(request.status === "PENDING" && currentUser?.role === "ROLE_MANAGER") && (
+              {(request.status === "PENDING") && (
                 <td>
                   <input
                     type="checkbox"
